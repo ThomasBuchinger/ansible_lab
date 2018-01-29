@@ -1,0 +1,10 @@
+---
+- name: "[Setup] Add DNS record {{ item.name }} to {{ ipa_domain }}"
+  ipa_dnsrecord:
+    record_name: "{{ item.name }}"
+    record_type: A
+    record_value: "{{ item.ip }}"
+    zone_name: "{{ item.domain }}"
+    state: present
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ ipa_admin_password }}"

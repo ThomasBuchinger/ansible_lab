@@ -1,0 +1,17 @@
+---
+- import_playbook: free-ipa.yml
+- import_playbook: satellite.yml
+
+
+- hosts: devel_seed
+  gather_facts: no
+  pre_tasks:
+  - include_role: 
+      name: utils
+      tasks_from: vm_create.yml
+    vars: 
+      vm_name: "{{ inventory_hostname_short }}"
+      vm_ip: "{{ ansible_host }}"
+      vm_memory: 8192
+
+#- include: rasp-m3.yml

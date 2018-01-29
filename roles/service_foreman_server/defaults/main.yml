@@ -1,0 +1,28 @@
+---
+default_net_name: home
+default_net_id: 10.0.0.0
+default_net_gateway: 10.0.0.254
+default_host_group: VMs
+
+vm_description: "This VM is managed by Foreman and Ansible"
+vm_env: production
+vm_hostgroup: "{{ default_host_group }}"
+vm_os: CentOS
+vm_guestid: centos64Guest
+vm_partition: "Kickstart Default"
+vm_network: "{{ default_net_name }}"
+vm_cpus: 1
+vm_sockets: 1
+vm_memory: 2048
+vm_disk_size: 100
+vm_start: 1
+
+vctr_host: 0.0.0.0
+vctr_user: Administrator@vsphere.local
+vctr_password: changeme
+compute_resource: "vctr-server"
+compute_datacenter: "datacenter-name"
+compute_cluster: "cluster-name"
+compute_scsi: ParaVirtualSCSIController
+compute_datastore: "datastore0"
+compute_network: "{{ vm_network }}"

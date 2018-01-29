@@ -1,0 +1,11 @@
+- name: "[Network] Set hostname to {{ inventory_hostname }}"
+  hostname: 
+    name: "{{ inventory_hostname }}"
+  when: ansible_hostname == "localhost"
+
+- name: "[DNS] Setup DNS Servers"
+  command: "nmcli modify connection ansible ipv4.dns {{ dns_server }}"
+  when: dns_server is defined
+- name: "[DNS] Setup DNS for IPA"
+  command: "nmcli modify connection ansible ipv4.dns \" {% for host in groups['ipa'] %} {{ hostvars[host]['ansible_default_ipv4']['address']   }} {% endfor %}\"  +ipv4.dns-search {{ ipa_domain }}"
+  when: dns_server is undefined

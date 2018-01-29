@@ -1,0 +1,35 @@
+[all]
+[all:vars]
+ansible_user=root
+ansible_ssh_private_key_file=~/.ssh/ansible_id_rsa
+ansible_ssh_extra_args="-o StrictHostKeyChecking=no -o IdentityFile=/dev/null"
+[all:children]
+home
+
+[home]
+
+[home:children]
+satellite
+openshift_nodes
+ipa
+vms
+
+[vms]
+
+
+[satellite]
+kate ansible_host=10.0.0.150
+
+[openshift_nodes]
+[openshift_nodes:children]
+openshift_masters
+
+[openshift_masters]
+
+
+[ipa]
+vm-voodoo ansible_host=10.0.0.151
+
+
+[devel_seed]
+

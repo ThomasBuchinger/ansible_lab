@@ -1,0 +1,3 @@
+---
+- import_tasks: prepare_host.yml
+- import_tasks: setup.yml

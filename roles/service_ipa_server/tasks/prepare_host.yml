@@ -1,0 +1,23 @@
+---
+
+- name: "[Prepare] Set FQDN"
+  hostname: 
+    name: "{{ ansible_hostname }}.{{ ipa_domain }}"
+
+- name: "[Prepare] Set /etc/hosts"
+  lineinfile: 
+    dest: /etc/hosts
+    regexp: "{{ ansible_default_ipv4.address }}"
+    line: "{{ ansible_default_ipv4.address }}    {{ ansible_fqdn }} {{ ansible_hostname }}"
+    backup: no
+
+- name: "[Prepare] Install DNS Utils"
+  yum:
+    name: "bind-utils"
+    state: present
+
+- name: "[Prepare] Verify DNS Settungs"
+  command: "nslookup www.google.at"
+  failed_when: result.rc == 1
+  changed_when: result.rc != 0
+  register: result

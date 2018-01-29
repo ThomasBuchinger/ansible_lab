@@ -1,0 +1,50 @@
+---
+- name: "[Prepare] Set FQDN"
+  hostname:
+    name: "{{ ansible_hostname }}.{{ ipa_domain }}"
+
+- name: "[Prepare] Set /etc/hosts"
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "{{ ansible_default_ipv4.address }}"
+    line: "{{ ansible_default_ipv4.address }}    {{ ansible_fqdn }} {{ ansible_hostname }}"
+    backup: no
+
+- name: "[Prepare] Installing release repositories"
+  yum:
+    name:
+      - epel-release
+      - https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm
+      - https://yum.theforeman.org/releases/latest/el7/x86_64/foreman-release.rpm
+    state: present
+    validate_certs: no
+- name: "[Prepare] Install foreman-installer"
+  yum:
+    name: foreman-installer
+    state: present
+- name: "[Prepare] Create Foreman Directory"
+  file:
+    name: /etc/foreman-installer/scenarios.d/
+    state: directory
+
+- name: "[Prepare] Create work directory"
+  file:
+    name: "{{ work_dir }}/service_foreman_server"
+    state: directory
+- name: "[Prepare] Copy helper scripts to target"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ work_dir }}/service_foreman_server/{{ item}}"
+    mode: 755
+  with_items: 
+  - "hammer.py"
+  - "post-config-os.py"
+
+
+- name: "[----------- DIRTY FIX -----------------------] Set File permissions for keys"
+  file:
+    path: "{{ work_dir }}/service_ansible/cred/{{ item }}"
+    mode: 0644
+  with_items:
+    - ansible_id_rsa
+    - ansible_id_rsa.pub

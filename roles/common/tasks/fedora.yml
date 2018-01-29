@@ -1,0 +1,4 @@
+- name: "[Fedora] Install default software for RHEL family"
+  yum:
+    name: "{{ redhat_packages }}"
+    state: present

@@ -1,0 +1,11 @@
+- name: "[RHEL] Install common software for RHEL family"
+  yum:
+    name: "{{ redhat_packages }}"
+    state: present
+- name: "[RHEL] Install RedHat specific software"
+  yum:
+    name: 
+    - vim
+    # if this packages appears in pip dependencies, rpm dependencies on urllib3 fail to install --> install rpm just in case
+    - python-urllib3
+    state: present

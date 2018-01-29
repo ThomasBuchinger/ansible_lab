@@ -1,0 +1,21 @@
+- name: "[RHEL] Install Redhat Packages"
+  include: redhat.yml
+  when: ansible_os_family|lower == 'redhat' and not(ansible_distribution|lower == 'fedora')
+- name: "[Fedora] Install Fedora Packages"
+  include: fedora.yml
+  when: ansible_distribution|lower == 'fedora'
+
+- name: "[Time] Setup Time Synchronisation"
+  yum:
+    name: "chrony"
+    state: present
+- name: "[Time] Starting Chronyd"
+  service:
+    name: "chronyd"
+    state: started
+    enabled: yes
+#- include: network.yml
+
+#- name: "Install Debian Tasks"
+#  include: debian.yml
+#  when: ansible_os_family|lower == 'debian'

@@ -1,0 +1,26 @@
+---
+- name: "[User] WORKAROUND: Delete User: {{ item.name }}"
+  ipa_user: 
+    name: "{{ item.name }}"
+    state: absent
+    validate_certs: false
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_user: "{{ ipa_admin_user }}"
+    ipa_pass: "{{ ipa_admin_password }}"
+
+- name: "[User] Configure User: {{ item.name }}"
+  ipa_user:
+    name: "{{ item.name }}"
+    displayname: "{{ item.fullname }}"
+    givenname: "{{ item.firstname }}"
+    password: "{{ item.password }}"
+    sn: "{{ item.lastname }}"
+    telephonenumber: "{{ item.phone }}"
+    state: present
+    mail: "{{ item.mail }}"
+    title: "{{ item.job }}"
+    loginshell: "{{ item.shell }}"
+    validate_certs: false
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_user: "{{ ipa_admin_user }}"
+    ipa_pass: "{{ ipa_admin_password }}"

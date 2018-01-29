@@ -1,0 +1,13 @@
+---
+- include_role:
+    name: service_foreman_server
+    tasks_from: create_vm.yml
+  delegate_to: "{{ groups.satellite[0] }}"
+
+
+- name: "[CONNECT] Waiting for VM to become available"
+  wait_for_connection:
+    timeout: 1800
+    sleep: 60
+- name: "[CONNECT] Gather Facts" 
+  setup:

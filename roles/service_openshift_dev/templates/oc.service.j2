@@ -1,0 +1,27 @@
+[Unit]
+Description=OpenShift Origin
+After=docker.service
+Requires=docker.service
+
+[Service]
+Environment=LOG_LEVEL=1
+Environment=METRICS_ENABLED=true
+Environment=LOGGING_ENABLED=true
+
+ExecStart=/usr/bin/oc cluster up --host-config-dir=/var/lib/openshift/config --host-data-dir={{ work_dir }}/service_openshift_dev/data --host-pv-dir=/var/lib/openshift/pv --host-volumes-dir=/var/lib/openshift/volumes --use-existing-config=true --public-hostname={{ ansible_fqdn }} --routing-suffix={{ ansible_default_ipv4.address }}.nip.io --loglevel=1 --metrics=${METRICS_ENABLED} --logging=${LOGGING_ENABLED}
+ExecStop=/usr/bin/oc cluster down
+WorkingDirectory=/var/lib/openshift
+
+Restart=no
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=oc
+User=root
+Type=oneshot
+RemainAfterExit=yes
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target
+
+

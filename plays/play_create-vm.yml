@@ -1,0 +1,29 @@
+---
+- hosts: satellite
+  gather_facts: yes
+  vars_prompt:
+  - name: vm_name 
+    default: "test-vm"
+    prompt: "VM Name:"
+    private: no
+  - name: vm_ip
+    default: "10.0.0.142"
+    prompt: "IP:"
+    private: no
+  - name: vm_cpus
+    default: 1
+    prompt: "#CPUs: "
+    private: no
+  - name: vm_memory
+    default: 2048
+    prompt: "Memory (MB): "
+    private: no
+  - name: vm_disk_size
+    default: 100
+    prompt: "Disk Size (GB): "
+    private: no
+
+  tasks:
+  - include_role:
+      name: utils
+      tasks_from: vm_create.yml

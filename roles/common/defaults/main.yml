@@ -1,0 +1,5 @@
+---
+redhat_packages:
+  - psmisc
+  - wget
+  - tree

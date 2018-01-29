@@ -1,0 +1,16 @@
+---
+- import_tasks: prepare_host.yml
+- import_tasks: openshift_ansible.yml
+ 
+- name: "[Main] Installing oc systemd unit"
+  template:
+    src: oc.service.j2
+    dest: /etc/systemd/system/oc.service
+- name: "[Main] Enable oc service"
+  systemd:
+    name: oc
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  async: 300
+  poll: 10

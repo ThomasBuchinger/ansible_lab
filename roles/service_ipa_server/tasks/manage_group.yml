@@ -1,0 +1,10 @@
+- name: "[Configure] Editing Group: {{ item.name }}"
+  ipa_group:
+    name: "{{ item.name }}"
+    user: "{{ item.member }}"
+    state: present
+    validate_certs: false
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_user: "{{ ipa_admin_user }}"
+    ipa_pass: "{{ ipa_admin_password }}"
+

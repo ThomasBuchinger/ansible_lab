@@ -1,0 +1,89 @@
+---
+- name: "[Prepare] Installing packages"
+  yum:
+    name: 
+    - wget 
+    - git
+    - net-tools
+    - bind-utils
+    - iptables-services 
+    - bridge-utils 
+    - bash-completion 
+    - kexec-tools 
+    - sos 
+    - psacct
+    - yum-utils
+    - ansible
+    - pyOpenSSL
+    - centos-release-openshift-origin37
+    state: present
+- name: "[Install] Installing Openshift Origin release"
+  yum:
+    name: 
+    - atomic
+    - origin-clients
+
+
+# Configure Docker Daemon
+#
+- name: "[Docker] Configure Docker"
+  lineinfile:
+    line: "INSECURE_REGISTRY='--insecure-registry {{ docker_registry }}'"
+    regexp: "INSECURE_REGISTRY"
+    path: /etc/sysconfig/docker
+  notify:
+  - docker_restart
+- name: "[Docker] Restart Docker Daemon"
+  meta: flush_handlers
+
+
+# Configure Persistent volume storage
+#
+- name: "[Storage] Prepare Openshift Root directory"
+  file:
+    name: "/var/lib/openshift"
+    state: directory
+- name: "[Storage] Prepare data directory"
+  file:
+    name: "{{ work_dir }}/service_openshift_dev/data"
+    state: directory
+
+# Configure Container Networking
+#
+- name: "[Network] Configuring OS: enable routing"
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: 1
+    state: present
+
+- name: "[Network] Create dockerc firewall zone"
+  command: "firewall-cmd --permanent --new-zone dockerc"
+  register: cmd_zone
+  changed_when: cmd_zone.rc != 26
+  failed_when: not (cmd_zone.rc == 26 or cmd_zone.rc == 0)
+  notify:
+    firewalld_reload
+- name: "[Network] Reload firewalld"
+  command: "firewall-cmd --reload"
+- name: "[Network] Condigure Firewall"
+  firewalld:
+    source: "{{ docker_network }}/{{ docker_network_prefix }}"
+    zone: 'dockerc'
+    state: enabled
+    permanent: true
+- name: "[Network] Setting up firewall rules"
+  firewalld:
+    port: "{{ item.port }}"
+    state: enabled
+    zone: "{{ item.zone }}"
+    permanent: true
+  with_items:
+    - { port: '8443/tcp', zone: 'public' }
+    - { port: '8080/tcp', zone: 'public' }
+    - { port: '8000/tcp', zone: 'public' }
+    - { port: '80/tcp', zone: 'public' }
+    - { port: '8443/tcp', zone: 'dockerc' }
+    - { port: '53/udp', zone: 'dockerc' }
+    - { port: '8053/udp', zone: 'dockerc' }
+- name: "[Network] Reload firewalld"
+  command: "firewall-cmd --reload"

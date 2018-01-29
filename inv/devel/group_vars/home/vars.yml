@@ -1,0 +1,28 @@
+---
+# General
+work_dir: "/opt/work"
+
+# service_ansible
+ansible_git_url: "https://github.com/ThomasBuchinger/Ansibe_Lab_automation.git"
+
+# service_ipa_server
+ipa_domain: home.local
+ipa_ip: "10.0.0.151"
+ipa_dns_forwarder: "10.0.0.254"
+ipa_base_command: "ipa-server-install -U"
+ipa_packages:
+  - ipa-server
+  - ipa-server-dns
+  - bind
+  - bind-dyndb-ldap
+  - mod_auth_kerb
+ipa_log_file: "/var/log/ansible-ipa-server-install.log"
+
+# service_forman_server
+esx_hostname: "esx.home.local"
+esx_datastore: "datastore0"
+
+vm_description: "This VM is created by Ansible"
+vm_network: "MyNetwork"
+
+foreman_prov_id: "31"

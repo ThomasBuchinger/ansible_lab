@@ -1,0 +1,8 @@
+---
+- import_tasks: prepare_host.yml
+
+- import_tasks: configure_foreman_server.yml
+- import_tasks: configure_foreman_proxy-plugins.yml
+
+- import_tasks: configure_resources.yml
+

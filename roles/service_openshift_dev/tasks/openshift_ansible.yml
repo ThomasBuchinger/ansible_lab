@@ -1,0 +1,9 @@
+---
+- name: "[Ansible] Creating Inventory File"
+  template:
+    src: ansible_inventory.j2
+    dest: /etc/ansible/inventory
+- name: "[Ansible] Clone openshift_ansible git repository"
+  git:
+    repo: "https://github.com/openshift/openshift-ansible.git"
+    dest: "{{ work_dir }}/service_openshift_dev/git/openshift_ansible"

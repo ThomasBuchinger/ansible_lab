@@ -1,0 +1,17 @@
+---
+- name: "[NFS] Install NFS Utils"
+  yum:
+    name: nfs-utils
+    state: present
+
+- name: "[NFS] creating mount point for share {{ name }}"
+  file: 
+    path: "/share/{{ name }}/"
+    state: directory
+
+- name: "[NFS] Mount NFS share {{ name }} from {{ server }}:/{{ src }}"
+  mount:
+    name: "/share/{{ name }}"
+    src: "{{ server }}:/{{ src }}"
+    fstype: nfs
+    state: mounted

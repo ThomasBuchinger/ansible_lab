@@ -1,0 +1,5 @@
+---
+- name: "Debian packages"
+  apt:
+    name: "vim"
+    state: present

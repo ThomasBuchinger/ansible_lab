@@ -1,0 +1,12 @@
+---
+- hosts: satellite
+  vars_prompt:
+  - name: vm_name 
+    default: "test-vm"
+    prompt: "VM Name:"
+    private: no
+
+  tasks:
+  - include_role:
+      name: "service_foreman_server"
+      tasks_from: destroy_vm.yml

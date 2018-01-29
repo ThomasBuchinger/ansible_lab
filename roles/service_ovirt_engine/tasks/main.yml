@@ -1,0 +1,9 @@
+---
+- name: "[Setup] Install Repofile"
+  yum:
+    name: "http://resources.ovirt.org/pub/yum-repo/ovirt-release42.rpm"
+    state: present
+- name: "[Setup] Install oVirt Engine"
+  yum:
+    name: "ovirt-hosted-engine-setup"
+    state: present

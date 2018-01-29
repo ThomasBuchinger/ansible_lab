@@ -1,0 +1,130 @@
+---
+- name: "[Setup] Run Foreman-Installer"
+  command: >
+    foreman-installer --detailed-exitcodes  --no-colors
+    --enable-foreman
+    --enable-foreman-proxy  
+      --enable-puppet 
+      --enable-foreman-cli 
+      --enable-foreman-cli-openscap
+      --enable-foreman-plugin-ansible
+      --enable-foreman-plugin-cockpit
+      --enable-foreman-plugin-docker
+      --enable-foreman-plugin-hooks
+      --enable-foreman-plugin-openscap
+      --enable-foreman-plugin-ovirt-provision
+      --enable-foreman-plugin-remote-execution
+      --enable-foreman-plugin-setup
+      --enable-foreman-plugin-tasks
+      --enable-foreman-plugin-templates
+      --enable-foreman-compute-openstack
+      --enable-foreman-compute-ovirt
+      --enable-foreman-compute-rackspace
+      --enable-foreman-compute-vmware
+
+    --foreman-admin-password={{ foreman_admin_password }}
+    --foreman-admin-email=thomas.buchinger@outlook.com
+    --foreman-db-manage=true
+    --foreman-db-type=postgresql
+      
+    --foreman-compute-ec2-version='installed'
+    --foreman-compute-gce-version='installed'
+    --foreman-compute-libvirt-version='installed'
+    --foreman-compute-openstack-version='installed'
+    --foreman-compute-ovirt-version='installed'
+    --foreman-compute-rackspace-version='installed'
+    --foreman-compute-vmware-version='installed'
+
+    --foreman-plugin-discovery-image-name="fdi-image-latest.tar"
+    --foreman-plugin-discovery-install-images=false
+    --foreman-plugin-discovery-source-url="http://downloads.theforeman.org/discovery/releases/latest/"
+    --foreman-plugin-discovery-tftp-root="/var/lib/tftpboot"
+
+    --foreman-plugin-ovirt-provision-package="tfm-rubygem-ovirt_provision_plugin"
+
+    --foreman-plugin-tasks-package="tfm-rubygem-foreman-tasks"
+    --foreman-plugin-tasks-service="foreman-tasks"
+
+    --foreman-proxy-dir="/usr/share/foreman-proxy"
+    --foreman-proxy-foreman-base-url=https://{{ ansible_fqdn }}
+    --foreman-proxy-use-sudoers=true 
+    --foreman-proxy-use-sudoersd=true
+    --foreman-proxy-user="foreman-proxy" 
+    --foreman-proxy-manage-puppet-group=true
+    --foreman-proxy-manage-sudoersd=true
+    
+    --foreman-proxy-freeipa-config="/etc/ipa/default.conf"
+    --foreman-proxy-freeipa-remove-dns=true
+     
+
+    --foreman-proxy-puppet=true
+    --foreman-proxy-puppet-ssl-ca="/etc/puppetlabs/puppet/ssl/certs/ca.pem"
+    --foreman-proxy-puppet-ssl-cert="/etc/puppetlabs/puppet/ssl/certs/{{ ansible_fqdn }}.pem"
+    --foreman-proxy-puppet-ssl-key="/etc/puppetlabs/puppet/ssl/private_keys/{{ ansible_fqdn }}.pem" 
+    --foreman-proxy-puppet-url="https://{{ ansible_fqdn }}:8140"
+
+    --foreman-proxy-bind-host="*"
+    --foreman-proxy-dhcp=true
+    --foreman-proxy-dhcp-config="/etc/dhcp/dhcpd.conf"
+    --foreman-proxy-dhcp-gateway={{ ansible_default_ipv4.gateway }}
+    --foreman-proxy-dhcp-interface={{ ansible_default_ipv4.interface }}
+    --foreman-proxy-dhcp-leases="/var/lib/dhcpd/dhcpd.leases"
+    --foreman-proxy-dhcp-manage-acls=true
+    --foreman-proxy-dhcp-managed=true
+    --foreman-proxy-dhcp-nameservers={{ ipa_ip }}
+    --foreman-proxy-dhcp-option-domain={{ ipa_domain }}
+    
+    --foreman-proxy-dns=true
+    --foreman-proxy-dns-forwarders={{ ipa_ip }}
+    --foreman-proxy-dns-interface={{ ansible_default_ipv4.interface }}
+    --foreman-proxy-dns-managed=true
+    --foreman-proxy-dns-reverse=0.0.10.in-addr.arpa
+    --foreman-proxy-dns-zone={{ ipa_domain }}
+    --foreman-proxy-dns-tsig-principal=foremanproxy/{{ ansible_hostname }}@{{ ipa_domain|upper }}
+
+    --foreman-proxy-ssl=true
+    --foreman-proxy-ssl-ca="/etc/puppetlabs/puppet/ssl/certs/ca.pem"
+    --foreman-proxy-ssl-cert="/etc/puppetlabs/puppet/ssl/certs/{{ ansible_fqdn }}.pem"
+    --foreman-proxy-ssl-key="/etc/puppetlabs/puppet/ssl/private_keys/{{ ansible_fqdn }}.pem"
+    --foreman-proxy-ssldir="/etc/puppetlabs/puppet/ssl"
+    
+    --foreman-proxy-tftp=true
+    --foreman-proxy-tftp-manage-wget=true
+    --foreman-proxy-tftp-managed=true
+    --foreman-proxy-tftp-root="/var/lib/tftpboot"
+    --foreman-proxy-tftp-servername={{ ansible_default_ipv4.address }}
+      
+  register: cmd
+  changed_when: cmd.rc == 2
+  failed_when: cmd.rc !=0 and cmd.rc !=2
+
+- name: "[Setup] Disable OS fact overriding the selected value in provisioning"
+  command: "hammer settings set --id ignore_facts_for_operatingsystem --value true"
+  register: cmd
+  changed_when: false
+  failed_when: cmd.rc !=0
+
+
+- name: "[Setup] Configure Firewall services"
+  firewalld: 
+    service: "{{ item }}" 
+    state: enabled 
+    permanent: true 
+    immediate: true
+  with_items:
+  - dns
+  - dhcp
+  - tftp
+  - http
+  - https
+- name: "[Setup] Configure Firewall ports"
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  with_items:
+  - "3000/tcp"
+  - "5910-5930/tcp"
+  - "8140/tcp"
+  - "8443/tcp"

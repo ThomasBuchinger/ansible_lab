@@ -1,0 +1,21 @@
+---
+ipa_groups:
+  - name: service_accounts
+    member:
+    - svc_service_user
+    - svc_foreman
+
+ipa_dns:
+  - { name: "dns", domain: "{{ ipa_domain }}", ip: "8.8.8.8"}
+
+ipa_users:
+  - name: svc_service_user
+    fullname: "Ansible Test Service User"
+    firstname: Ansible
+    lastname: Service User
+    password: ""
+    mail: [ "ansible@buc.local" ]
+    phone: "1234567890"
+    job: "Service Account"
+    shell: "/bin/nologin"
+

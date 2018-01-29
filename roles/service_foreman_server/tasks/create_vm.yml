@@ -1,0 +1,27 @@
+---
+- name: "[Foreman] Create {{ vm_name }} on Foreman..."
+  command: >
+    python ./hammer.py host create
+      --name "{{ vm_name }}.{{ ipa_domain }}" 
+      --build=true 
+      --comment="{{ vm_description }}" 
+      --compute-resource="{{ compute_resource }}" 
+      --domain="{{ ipa_domain }}"
+      --enabled=true 
+      --environment="{{ vm_env }}" 
+      --hostgroup="{{ vm_hostgroup }}" 
+      --ip="{{ vm_ip }}" 
+      --managed=true 
+      --operatingsystem="{{ vm_os }}" 
+      --partition-table="{{ vm_partition }}" 
+      --provision-method="build" 
+      --subnet="{{ vm_network }}" 
+      --compute-attributes="cpus={{ vm_cpus }},corespersocket={{ vm_sockets }},memory_mb={{ vm_memory }},cluster={{ compute_cluster }},path=/,guest_id={{ vm_guestid }},scsi_controller_type={{ compute_scsi }},start={{ vm_start }}" 
+      --interface="type=interface,managed=true,primary=true,provision=true,compute_type=VirtualVmxnet3,compute_network={{ compute_network }}" 
+      --volume="datastore={{ compute_datastore }},size_gb={{ vm_disk_size }},thin=true"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+

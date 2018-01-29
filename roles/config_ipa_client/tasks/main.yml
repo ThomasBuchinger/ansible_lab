@@ -1,0 +1,35 @@
+---
+- name: "[Prepare] Install packages"
+  yum:
+    name: 
+    - ipa-client
+    - bind-utils
+#    - NetworkManager-glib
+#    - libnm-qt
+#    - libsemanage-python
+#    - policycoreutils-python
+
+    state: present
+- name: "[Prepare] Checking installation"
+  shell: "if [ -f /etc/sssd/sssd.conf ]; then cat /etc/sssd/sssd.conf; else echo not installed; fi"
+  register: sssd_conf
+  ignore_errors: True
+  changed_when: False
+
+- name: "[Prepare] Set FQDN"
+  hostname:
+    name: "{{ ansible_hostname }}.{{ ipa_domain }}"
+
+- name: "[Prepare] Verify DNS Settungs"
+  command: "nslookup ipa.{{ ipa_domain }}"
+  failed_when: result.rc == 1
+  changed_when: result.rc != 0
+  register: result
+
+
+- name: "[Enrollment] Configure IPA client"
+  command: "ipa-client-install -U --no-ntp -p admin -w {{ ipa_admin_password }} --domain {{ ipa_domain }} --mkhomedir --force-join"
+  when: "'ipa_server' not in sssd_conf.stdout"
+
+- name: "[SSH] disabling root login via SSH"
+  meta: noop  

@@ -1,0 +1,5 @@
+---
+- include_role:
+    name: service_foreman_server
+    tasks_from: destroy_vm.yml
+  delegate_to: "{{ groups.satellite[0] }}"

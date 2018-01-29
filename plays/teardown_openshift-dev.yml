@@ -1,0 +1,10 @@
+---
+- hosts: openshift_nodes
+  gather_facts: no
+  pre_tasks:
+  - include_role: 
+      name: utils
+      tasks_from: vm_destroy.yml
+    vars: 
+      vm_name: "{{ inventory_hostname_short }}"
+

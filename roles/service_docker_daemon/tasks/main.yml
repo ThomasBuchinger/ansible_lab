@@ -1,0 +1,13 @@
+---
+- name: "[Install] Install docker daemon"
+  yum:
+    name:
+    - docker
+    - atomic
+    state: present
+- name: "[Service] Configure systemd"
+  service:
+    name: docker
+    state: started
+    enabled: true
+

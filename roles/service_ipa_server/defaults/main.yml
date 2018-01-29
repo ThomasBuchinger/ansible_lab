@@ -1,0 +1,13 @@
+---
+ipa_domain: example.com       # All lowercase. Actual DNS domain.
+ipa_admin_password: "changeme"
+ipa_dir_admin_password: "changeme"
+
+ipa_base_command: "ipa-server-install -U"
+ipa_packages:
+  - ipa-server
+  - ipa-server-dns
+  - bind
+  - bind-dyndb-ldap
+  - mod_auth_kerb
+ipa_log_file: "/var/log/ansible-ipa-server-install.log"

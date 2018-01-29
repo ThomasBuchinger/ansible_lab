@@ -1,0 +1,7 @@
+---
+- hosts: satellite
+  roles: 
+    - common
+    - config_ipa_client
+#    - service_ansible
+    - service_foreman_server

@@ -1,0 +1,15 @@
+---
+ipa_admin_user: "admin"
+ipa_admin_password: "changeme"
+ipa_dir_admin_password: "changeme"
+
+foreman_admin_password: "changeme"
+
+
+esx_host_connection: "0.0.0.0"
+esx_user: "root"
+esx_password: "changeme"
+
+vctr_host: "0.0.0.0"
+vctr_user: "Administrator@vsphere.local"
+vctr_password: "changeme"

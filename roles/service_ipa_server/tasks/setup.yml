@@ -1,0 +1,37 @@
+---
+
+- name: "[Setup] Installing packages"
+  yum:
+    name: "{{ ipa_packages }}" 
+    state: present
+- name: "[Setup] Running IPA setup command"
+  command: "{{ ipa_base_command }} --no-ntp --setup-dns --admin-password {{ ipa_admin_password }} --ds-password {{ ipa_dir_admin_password }} --domain {{ ipa_domain}} --realm {{ ipa_domain|upper }} --no-host-dns --mkhomedir --forwarder {{ipa_dns_forwarder }} --log-file {{ ipa_log_file }}"
+  args:
+    creates: /etc/httpd/conf.d/ipa.conf
+- name: "[Setup] Configure Firewall"
+  # firewall-cmd --permanent --add-service={ntp,http,https,ldap,ldaps,kerberos,kpasswd,dns}
+  firewalld: 
+    service: "{{ item }}" 
+    state: enabled 
+    permanent: true 
+    immediate: true
+  with_items:
+  - ntp
+  - http
+  - https
+  - freeipa-ldap
+  - freeipa-ldaps
+  - freeipa-trust
+  - kpasswd
+  - dns
+
+- name: "[Setup] Add DNS record ipa to {{ ipa_domain }}"
+  ipa_dnsrecord:
+    record_name: "ipa"
+    record_type: A
+    record_value: "{{ ansible_default_ipv4.address }}"
+    zone_name: "{{ ipa_domain }}"
+    state: present
+    ipa_host: "{{ ansible_fqdn }}"
+    ipa_pass: "{{ ipa_admin_password }}"
+    validate_certs: no
