@@ -9,8 +9,6 @@ This Ansible project automates the setup of essential infrastructure services an
 ### Ansible
 The heart piece os this project is the Ansible configuration itself. All the configuration is stored in git, including necessary credentials for external systems, which are encrypted using ansible-vault.  
 
-The site.yml contains infrastructure components (currently FreeIPA and Foreman) which other plays can rely on to be present, while additional applications live in the plays directory. Applications consist of a spinup_<name>.yml which performs setup of the component from stratch (in general using the latest release) and can be disposed again with teardown_<name>.yml, while adhoc plays (play_<name>.yml) are generally smaller and are not associated with a specific component.
-
 ### Foreman
 Foreman is the provisioning tool in the environment. Configuration includes a all-in-one Foreman+SmartProxy and the necessary setup to automatically provsion new VMs. All VMs come with the latest CentOS release and the SSH key used by ansible for configuration. Compute is provided by VMware vCenter (which is not part ob the project). Additionally to the WebUI, VMs can also be provisioned programatically with the provided playbooks.
 
@@ -20,9 +18,16 @@ Note: Unfortunately the foreman ansible module assumes the Katello API, which is
 FreeIPA provides DNS resulution and SSO for the environment. New Clients are enrolled automatically and a basic configuration for DNS and User is imported via configuration.
 
 ### Openshift Origin
-Red Hat's Openshift is certainly worth keeping an eye on (although it is almost as unavoidable as containers themself). At the moment only a dev environment is configured here via 'oc cluster up', but maybe a more production grade setup (using the ansible installer) will be added later.
+The Upstream project Red Hat's Kubernetes distribution Openshift Enterprise. The setup is a single node development setup configured via 'oc cluster up', maybe a more production grade, multi-node setup will be added later
 
-Openshift Origin is configured as an all-in-one system with only a single master, depending on the number of openshift-nodes in the inventory additional nodes can join the cluster (the first node is still a single master) [comming soon]
+## Additional content
+The site.yml contains infrastructure components (currently FreeIPA and Foreman) which other plays can rely on to be present, while additional applications live in the plays directory. Applications consist of a spinup_<name>.yml which performs setup of the component from stratch (in general using the latest release) and can be disposed again with teardown_<name>.yml, while adhoc plays (play_<name>.yml) are generally smaller and are not associated with a specific component.
+
+Additional roles:
+- common: Install common packages 
+- config_ipa_client: Enrolles a client in FreeIPA
+- config_nfs: simple NFS mount
+- service_docker_daemon: Configures Docker Deamon (used by Openshift)
 
 ## Next
 * OpenStack (Dev-Stack)
