@@ -9,3 +9,7 @@
     # if this packages appears in pip dependencies, rpm dependencies on urllib3 fail to install --> install rpm just in case
     - python-urllib3
     state: present
+- name: "[VMware] Install open-vm-tools"
+  yum:
+    name: open-vm-tools
+  when: ansible_virtualization_type == 'VMware'

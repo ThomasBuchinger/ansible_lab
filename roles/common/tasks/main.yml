@@ -16,6 +16,43 @@
     enabled: yes
 #- include: network.yml
 
+- name: "[SSH] disable reverse DNS lookups"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: 'UseDNS no'
+    regexp: '#UseDNS yes'
+
+- name: "[Cockpit] Install Cockpit"
+  yum:
+    name:
+    - cockpit-docker
+    - cockpit-selinux
+    - cockpit-sosreport
+    - cockpit-storaged
+    - cockpit-bridge
+    - cockpit-ws
+    - cockpit
+    - cockpit-kdump
+    - cockpit-pcp
+    - cockpit-system
+    - cockpit-dashboard
+    - cockpit-kubernetes
+    - cockpit-networkmanager
+    - cockpit-packagekit
+    state: present
+- name: "[Cockpit] Configure Firewall"
+  firewalld:
+    service: cockpit
+    immediate: true
+    permanent: true
+    state: enabled
+- name: "[Cockpit] Enable Cockpit "
+  systemd:
+    name: cockpit.socket
+    state: started
+    enabled: true
+
+
 #- name: "Install Debian Tasks"
 #  include: debian.yml
 #  when: ansible_os_family|lower == 'debian'
