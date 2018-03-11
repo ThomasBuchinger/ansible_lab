@@ -1,0 +1,43 @@
+---
+# Remember, leave a key empty if there is no value.  None will be a string,
+# not a Python "NoneType"
+
+actions:
+  # Delete Filebeat indices
+  #
+  1:
+    action: delete_indices
+    description: >-
+      Delete Filebeat indices 
+    options:
+      ignore_empty_list: True
+      disable_action: False
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: filebeat-
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: {{ elastic_log_retention }}
+  # Delete Matricbeat indices
+  #
+  2:
+    action: delete_indices
+    description: >-
+      Delete Metricbeat indices 
+    options:
+      ignore_empty_list: True
+      disable_action: False
+    filters:
+    - filtertype: pattern
+      kind: prefix
+      value: metricbeat-
+    - filtertype: age
+      source: name
+      direction: older
+      timestring: '%Y.%m.%d'
+      unit: days
+      unit_count: {{ elastic_metric_retention }}

@@ -1,0 +1,28 @@
+---
+- import_tasks: prepare_elastic-stack.yml
+
+- name: "[Filebeat] Install Filebeat"
+  yum:
+    name: "filebeat"
+    state: present
+
+- name: "[Filebeat] Enable modules"
+  copy:
+    remote_src: true
+    src: "/etc/filebeat/modules.d/{{ item }}.yml.disabled"
+    dest: "/etc/filebeat/modules.d/{{ item }}.yml"
+  ignore_errors: true 
+  with_items: "{{ elastic_filebeat_modules }}"
+
+- name: "[Filebeat] Configure Target"
+  template: 
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+    backup: yes
+  notify: "setup_filebeat"
+
+- name: "[Filebeat] Enable Filebeat service"
+  systemd:
+    name: filebeat
+    enabled: yes
+    state: started

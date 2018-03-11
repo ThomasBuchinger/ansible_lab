@@ -1,0 +1,15 @@
+---
+elastic_major_version: 6
+elastic_default_primaries: 1
+elastic_default_replicas: 0
+elastic_log_retention: 30
+elastic_metric_retention: 14
+elastic_adv_heap: 1g
+
+elastic_elasticsearch_host: "localhost:9200"
+elastic_kibana_host: "localhost:5601"
+
+elastic_filebeat_modules:
+  - system
+elastic_metricbeat_modules:
+  - system

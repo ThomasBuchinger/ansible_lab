@@ -1,0 +1,10 @@
+---
+- hosts: logging
+  roles: 
+    - service_logging_elastic
+
+- hosts: all
+  tasks:
+  - include_role:
+      name: service_logging_elastic
+      tasks_from: beats.yml

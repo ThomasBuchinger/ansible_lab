@@ -10,15 +10,20 @@ This Ansible project automates the setup of essential infrastructure services an
 The heart piece os this project is the Ansible configuration itself. All the configuration is stored in git, including necessary credentials for external systems, which are encrypted using ansible-vault.  
 
 ### Foreman
-Foreman is the provisioning tool in the environment. Configuration includes a all-in-one Foreman+SmartProxy and the necessary setup to automatically provsion new VMs. All VMs come with the latest CentOS release and the SSH key used by ansible for configuration. Compute is provided by VMware vCenter (which is not part ob the project). Additionally to the WebUI, VMs can also be provisioned programatically with the provided playbooks.
+Foreman is the provisioning tool in the environment. Configuration includes a all-in-one Foreman+SmartProxy, with IPA as authentication provider and the necessary setup to automatically provsion new VMs. All VMs come with the latest CentOS release and the SSH key used by ansible for configuration. Compute is provided by VMware vCenter (which is not part ob the project). Additionally to the WebUI, VMs can also be provisioned programatically with the provided playbooks.
 
 Note: Unfortunately the foreman ansible module assumes the Katello API, which is different from the pure Foreman API, therefore all actions have been implemented by a python wrapper around the hammer cli tool.
 
 ### FreeIPA
-FreeIPA provides DNS resulution and SSO for the environment. New Clients are enrolled automatically and a basic configuration for DNS and User is imported via configuration.
+FreeIPA provides DNS resulution and SSO for the environment. All Clients are automatically enrolled, DNS Records and Users are imported from via configuration. The password policy is relaxed to allow never expiring passwords.
+
+Note: Additional IPA modules are included, since the original modules do not cover the whole API (yet)
 
 ### Openshift Origin
 The Upstream project Red Hat's Kubernetes distribution Openshift Enterprise. The setup is a single node development setup configured via 'oc cluster up', maybe a more production grade, multi-node setup will be added later
+
+### Elatic-Stack
+A small Elastic-Stack (only Beats, elasticsearch and Kibana) is responsible for log and status monitoring. The push architecture makes it a perfect match for a lab, where services come and go and the dashboards shipped by Elastic cover most monitoring needs
 
 ## Additional content
 The site.yml contains infrastructure components (currently FreeIPA and Foreman) which other plays can rely on to be present, while additional applications live in the plays directory. Applications consist of a spinup_<name>.yml which performs setup of the component from stratch (in general using the latest release) and can be disposed again with teardown_<name>.yml, while adhoc plays (play_<name>.yml) are generally smaller and are not associated with a specific component.
@@ -29,11 +34,11 @@ Additional roles:
 - config_nfs: simple NFS mount
 - service_docker_daemon: Configures Docker Deamon (used by Openshift)
 
+
 ## Next
 * OpenStack (Dev-Stack)
 * Jenkins
 * Mail Server
-* Foreman IPA Integration
 * Monitoring (Icinga, Prometheus, Hawkular?)
 
 ## Pre-Existing Infrastructure

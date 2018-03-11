@@ -1,0 +1,3 @@
+---
+- import_tasks: configure_filebeat.yml
+- import_tasks: configure_metricbeat.yml

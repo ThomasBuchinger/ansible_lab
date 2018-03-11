@@ -1,0 +1,19 @@
+---
+- name: "[Install] Create Elasticsearch Curator Repo "
+  yum_repository:
+    name: "elasticsearch-curator-5"
+    description: "Elasticsearch Curator Repository"
+    file: elastic
+    baseurl: "https://packages.elastic.co/curator/5/centos/{{ ansible_distribution_major_version }}"
+    gpgcheck: no
+    gpgkey:  "https://packages.elastic.co/GPG-KEY-elasticsearch"
+
+- name: "[elasticsearch-curator] Install configuration"
+  template:
+    src: curator.yml.j2
+    dest: /etc/elasticsearch/curator.yml
+
+- name: "[elasticsearch-curator] Add CRON job"
+  copy:
+    content: "export HOSTS=\"localhost:9200\"; curator --config /dev/null /etc/elasticsearch/curator.yml"
+    dest: /etc/cron.daily/elasticsearch-curator.conf

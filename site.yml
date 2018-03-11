@@ -2,6 +2,7 @@
 - import_playbook: free-ipa.yml
 - import_playbook: satellite.yml
 
+- import_playbook: logging.yml
 
 - hosts: devel_seed
   gather_facts: no

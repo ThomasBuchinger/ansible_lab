@@ -1,0 +1,59 @@
+---
+- import_tasks: prepare_elastic-stack.yml
+
+- name: "[elasticsearch] Install elaticsearch and dependencies"
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - java
+    - elasticsearch
+    - elasticsearch-curator
+    - pcp-pmda-elasticsearch
+
+- name: "[elasticsearch] Create default configuration file"
+  template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    backup: yes
+- name: "[elasticsearch] Configure JVM Setting: Min Heap Size"
+  lineinfile:
+    regexp: "^-Xms"
+    line: "-Xms{{ elastic_adv_heap }}"
+    path: /etc/elasticsearch/jvm.options
+- name: "[elasticsearch] Configure JVM Setting: Max Heap Size"
+  lineinfile:
+    regexp: "^-Xmx"
+    line: "-Xmx{{ elastic_adv_heap }}"
+    path: /etc/elasticsearch/jvm.options
+- name: "[elasticsearch] Create Systemd drop-in path"
+  file:
+    path: /etc/systemd/system/elasticsearch.service.d/
+    state: directory
+- name: "[elasticsearch] Set LimitMemlock=infinity in systemd"
+  template:
+    src: elasticsearch_systemd.conf.j2
+    dest: /etc/systemd/system/elasticsearch.service.d/limit_memory.conf
+- name: "[elasticsearch] Install Plugins"
+  elasticsearch_plugin:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ingest-geoip
+    - ingest-user-agent    
+
+
+- name: "[elasticsearch] Enable elasticsearch service"
+  systemd:
+    name: elasticsearch
+    enabled: yes
+    state: started
+
+
+- name: "[elasticsearch] Configure firewall"
+  firewalld:
+    port: "9200/tcp"
+    immediate: true
+    permanent: true
+    state: enabled
+

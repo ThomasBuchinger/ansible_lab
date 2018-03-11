@@ -1,0 +1,31 @@
+---
+- import_tasks: prepare_elastic-stack.yml
+
+- name: "[Install] Install Kibana"
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - kibana
+
+- name: "[Kibana] Create default configuration file"
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    backup: yes
+
+- name: "[Kibana] Enable Kibana and HTTPD services"
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - kibana
+    - httpd
+- name: "[Kibana] Configure firewall"
+  firewalld:
+    port: "5601/tcp"
+    immediate: true
+    permanent: true
+    state: enabled
+

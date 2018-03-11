@@ -1,0 +1,4 @@
+---
+- import_tasks: install_elasticsearch.yml
+- import_tasks: install_kibana.yml
+- import_tasks: setup_curator.yml

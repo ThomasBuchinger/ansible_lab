@@ -1,0 +1,29 @@
+---
+- import_tasks: prepare_elastic-stack.yml
+
+- name: "[Metricbeat] Install Metricbeat"
+  yum:
+    name: "metricbeat"
+    state: present
+
+- name: "[Metricbeat] Enable modules"
+  copy:
+    remote_src: true
+    src: "/etc/metricbeatbeat/modules.d/{{ item }}.yml.disabled"
+    dest: "/etc/metricbeatbeat/modules.d/{{ item }}.yml"
+  ignore_errors: true 
+  with_items: "{{ elastic_filebeat_modules }}"
+
+- name: "[Metricbeatbeat] Configure Target"
+  template: 
+    src: metricbeat.yml.j2
+    dest: /etc/metricbeat/metricbeat.yml
+    backup: yes
+  notify: "setup_metricbeat"
+
+- name: "[Metricbeat] Enable Metricbeat service"
+  systemd:
+    name: metricbeat
+    enabled: yes
+    state: started
+#

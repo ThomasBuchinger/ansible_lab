@@ -1,0 +1,12 @@
+---
+- name: "[Install] Create Elastic Repo"
+  yum_repository:
+    name: "elasticsearch-{{ elastic_major_version }}"
+    description: "Elastic Repository for {{ elastic_major_version }}.x packages"
+    file: elastic
+    baseurl: "https://artifacts.elastic.co/packages/{{ elastic_major_version }}.x/yum"
+    gpgcheck: no
+    repo_gpgcheck: no
+    gpgkey: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    
+
