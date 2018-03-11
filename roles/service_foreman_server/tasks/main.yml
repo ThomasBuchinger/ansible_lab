@@ -5,4 +5,5 @@
 - import_tasks: configure_foreman_proxy-plugins.yml
 
 - import_tasks: configure_resources.yml
+- import_tasks: ext_ipa.yml
 

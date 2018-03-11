@@ -5,7 +5,7 @@
     name: "{{ ipa_packages }}" 
     state: present
 - name: "[Setup] Running IPA setup command"
-  command: "{{ ipa_base_command }} --no-ntp --setup-dns --admin-password {{ ipa_admin_password }} --ds-password {{ ipa_dir_admin_password }} --domain {{ ipa_domain}} --realm {{ ipa_domain|upper }} --no-host-dns --mkhomedir --forwarder {{ipa_dns_forwarder }} --log-file {{ ipa_log_file }}"
+  command: "{{ ipa_base_command }} --no-ntp --setup-dns --auto-reverse --admin-password {{ ipa_admin_password }} --ds-password {{ ipa_dir_admin_password }} --domain {{ ipa_domain}} --realm {{ ipa_domain|upper }} --no-host-dns --mkhomedir --forwarder {{ipa_dns_forwarder }} --log-file {{ ipa_log_file }}"
   args:
     creates: /etc/httpd/conf.d/ipa.conf
 - name: "[Setup] Configure Firewall"
@@ -35,3 +35,5 @@
     ipa_host: "{{ ansible_fqdn }}"
     ipa_pass: "{{ ipa_admin_password }}"
     validate_certs: no
+
+- import_tasks: configure_password_policy.yml

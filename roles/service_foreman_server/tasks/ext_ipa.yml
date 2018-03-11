@@ -1,0 +1,38 @@
+---
+- name: "[IPA] Lookup IPA hostname"
+  set_fact:
+    tmp_ipa_hostname: "{{ lookup('dig', '{{ ipa_ip }}/PTR', '@{{ ipa_ip}}') | regex_replace('\\.$', '')  }}"
+
+- name: "[IPA] Setup Service account"
+  ipa_service:
+    name: "HTTP/{{ ansible_fqdn }}"
+    force: true
+    hosts: 
+      - "{{ ansible_fqdn }}"
+    mode: 'add'
+    state: "present"
+    ipa_host: "{{ tmp_ipa_hostname  }}"
+    ipa_pass: "{{ ipa_admin_password }}"
+    validate_certs: no
+
+
+- name: "[IPA] Setup foreman with foreman-installer"
+  command: >
+    foreman-installer --detailed-exitcodes  --no-colors
+    --foreman-ipa-authentication=true
+  register: cmd
+  changed_when: cmd.rc == 2
+  failed_when: cmd.rc !=0 and cmd.rc !=2
+
+- name: "[IPA] Configure Foreman group: ipa_admins"
+  command: "python ./hammer.py user-group create --name ipa_admins --admin yes"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  register: ipa_group
+  failed_when: ipa_group.rc >= 2
+  changed_when: ipa_group.rc == 1
+
+- name: "[IPA] Configure External Group Mapping for ipa_admins"
+  command: "hammer user-group external create --name admins --auth-source-id 3 --user-group ipa_admins"
+  when: ipa_group|changed
+

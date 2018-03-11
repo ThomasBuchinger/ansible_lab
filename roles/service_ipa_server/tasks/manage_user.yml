@@ -24,3 +24,6 @@
     ipa_host: "{{ ansible_fqdn }}"
     ipa_user: "{{ ipa_admin_user }}"
     ipa_pass: "{{ ipa_admin_password }}"
+
+- name: "[User] Set Password expire Date"
+  shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_user }}; ipa user-mod {{ item.name }} --setattr='krbpasswordexpiration=20380101235959Z' "
