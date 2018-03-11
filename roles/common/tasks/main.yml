@@ -20,7 +20,7 @@
   lineinfile:
     path: /etc/ssh/sshd_config
     line: 'UseDNS no'
-    regexp: '#UseDNS yes'
+    regexp: '#?UseDNS '
 
 - name: "[Cockpit] Install Cockpit"
   yum:
