@@ -21,6 +21,8 @@
     title: "{{ item.job }}"
     loginshell: "{{ item.shell }}"
     validate_certs: false
+#    This options will be available in Ansible 2.5 (and apparently FreeIPA >4.5)
+#    krbpasswordexpiration: "20380101235959"
     ipa_host: "{{ ansible_fqdn }}"
     ipa_user: "{{ ipa_admin_user }}"
     ipa_pass: "{{ ipa_admin_password }}"
