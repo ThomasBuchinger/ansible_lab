@@ -1,0 +1,6 @@
+---
+- hosts: kvm_hypervisors
+  roles:
+    - common
+    - config_ipa_client
+    - service_kvm_hypervisor
