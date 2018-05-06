@@ -18,5 +18,5 @@
     state: started
 
 - import_tasks: network_bridge.yml
-
+- import_tasks: management_setup.yml
 

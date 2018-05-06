@@ -16,24 +16,29 @@
     src: elasticsearch.yml.j2
     dest: /etc/elasticsearch/elasticsearch.yml
     backup: yes
+  notify: restart_elasticsearch
 - name: "[elasticsearch] Configure JVM Setting: Min Heap Size"
   lineinfile:
     regexp: "^-Xms"
     line: "-Xms{{ elastic_adv_heap }}"
     path: /etc/elasticsearch/jvm.options
+  notify: restart_elasticsearch
 - name: "[elasticsearch] Configure JVM Setting: Max Heap Size"
   lineinfile:
     regexp: "^-Xmx"
     line: "-Xmx{{ elastic_adv_heap }}"
     path: /etc/elasticsearch/jvm.options
+  notify: restart_elasticsearch
 - name: "[elasticsearch] Create Systemd drop-in path"
   file:
     path: /etc/systemd/system/elasticsearch.service.d/
     state: directory
+  notify: restart_elasticsearch
 - name: "[elasticsearch] Set LimitMemlock=infinity in systemd"
   template:
     src: elasticsearch_systemd.conf.j2
     dest: /etc/systemd/system/elasticsearch.service.d/limit_memory.conf
+  notify: restart_elasticsearch
 - name: "[elasticsearch] Install Plugins"
   elasticsearch_plugin:
     name: "{{ item }}"
@@ -41,6 +46,7 @@
   with_items:
     - ingest-geoip
     - ingest-user-agent    
+  notify: restart_elasticsearch
 
 
 - name: "[elasticsearch] Enable elasticsearch service"

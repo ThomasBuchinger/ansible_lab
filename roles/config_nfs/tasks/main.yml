@@ -4,14 +4,14 @@
     name: nfs-utils
     state: present
 
-- name: "[NFS] creating mount point for share {{ name }}"
+- name: "[NFS] creating mount point for share {{ share_name }}"
   file: 
-    path: "/share/{{ name }}/"
+    path: "/share/{{ share_name }}/"
     state: directory
 
-- name: "[NFS] Mount NFS share {{ name }} from {{ server }}:/{{ src }}"
+- name: "[NFS] Mount NFS share {{ share_name }} from {{ server }}:/{{ src }}"
   mount:
-    name: "/share/{{ name }}"
+    name: "/share/{{ share_name }}"
     src: "{{ server }}:/{{ src }}"
     fstype: nfs
     state: mounted

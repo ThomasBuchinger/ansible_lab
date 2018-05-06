@@ -36,7 +36,6 @@
     - cockpit-pcp
     - cockpit-system
     - cockpit-dashboard
-    - cockpit-kubernetes
     - cockpit-networkmanager
     - cockpit-packagekit
     state: present

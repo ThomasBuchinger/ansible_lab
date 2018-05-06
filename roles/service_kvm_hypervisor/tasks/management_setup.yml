@@ -1,0 +1,9 @@
+---
+- name: "[Cockpit] Install cockpit plugin for libvirt"
+  yum:
+    name:
+      - cockpit-machines
+    state: present
+
+- name: "[WebVirtManager] Install WebVirtManager"
+  meta: "noop"

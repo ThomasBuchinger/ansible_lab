@@ -3,3 +3,8 @@
   command: "filebeat setup"
 - name: setup_metricbeat
   command: "metricbeat setup"
+
+- name: restart_elasticsearch
+  systemd:
+    name: elasticsearch
+    state: restarted
