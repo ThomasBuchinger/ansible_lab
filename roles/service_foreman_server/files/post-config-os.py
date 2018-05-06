@@ -21,7 +21,7 @@ def get_id_of(type_name, name):
     info, status=call_process("hammer os info --title '{}'", name )
   else:
     info, status=call_process("hammer {} info --name '{}'", type_name, name )
-  return re.compile("Id:\\s*(\\d+)").match(info.strip()).group(1)
+  return re.compile("Id:\\s*(\\d+)", re.MULTILINE).search(info.strip()).group(1)
 
 # Link a partition table to a OS
 #
