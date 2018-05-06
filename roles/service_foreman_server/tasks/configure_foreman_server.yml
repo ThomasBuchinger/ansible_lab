@@ -21,6 +21,7 @@
       --enable-foreman-compute-ovirt
       --enable-foreman-compute-rackspace
       --enable-foreman-compute-vmware
+      --enable-foreman-compute-libvirt
 
     --foreman-admin-password={{ foreman_admin_password }}
     --foreman-admin-email=thomas.buchinger@outlook.com
@@ -35,15 +36,9 @@
     --foreman-compute-rackspace-version='installed'
     --foreman-compute-vmware-version='installed'
 
-    --foreman-plugin-discovery-image-name="fdi-image-latest.tar"
-    --foreman-plugin-discovery-install-images=false
-    --foreman-plugin-discovery-source-url="http://downloads.theforeman.org/discovery/releases/latest/"
-    --foreman-plugin-discovery-tftp-root="/var/lib/tftpboot"
-
     --foreman-plugin-ovirt-provision-package="tfm-rubygem-ovirt_provision_plugin"
 
     --foreman-plugin-tasks-package="tfm-rubygem-foreman-tasks"
-    --foreman-plugin-tasks-service="foreman-tasks"
 
     --foreman-proxy-dir="/usr/share/foreman-proxy"
     --foreman-proxy-foreman-base-url=https://{{ ansible_fqdn }}
@@ -56,7 +51,6 @@
     --foreman-proxy-freeipa-config="/etc/ipa/default.conf"
     --foreman-proxy-freeipa-remove-dns=true
      
-
     --foreman-proxy-puppet=true
     --foreman-proxy-puppet-ssl-ca="/etc/puppetlabs/puppet/ssl/certs/ca.pem"
     --foreman-proxy-puppet-ssl-cert="/etc/puppetlabs/puppet/ssl/certs/{{ ansible_fqdn }}.pem"

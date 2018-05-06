@@ -9,7 +9,6 @@
     force: true
     hosts: 
       - "{{ ansible_fqdn }}"
-    mode: 'add'
     state: "present"
     ipa_host: "{{ tmp_ipa_hostname  }}"
     ipa_pass: "{{ ipa_admin_password }}"
@@ -34,5 +33,5 @@
 
 - name: "[IPA] Configure External Group Mapping for ipa_admins"
   command: "hammer user-group external create --name admins --auth-source-id 3 --user-group ipa_admins"
-  when: ipa_group|changed
+  when: ipa_group is changed
 

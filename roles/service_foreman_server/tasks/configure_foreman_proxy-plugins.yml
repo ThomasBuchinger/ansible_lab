@@ -9,7 +9,6 @@
     --enable-foreman-proxy-plugin-ansible
       
     --enable-foreman-proxy-plugin-openscap
-      --foreman-proxy-plugin-openscap-configure-openscap-repo=true
       --foreman-proxy-plugin-openscap-contentdir="/var/lib/foreman-proxy/openscap/content"
       --foreman-proxy-plugin-openscap-failed-dir="/var/lib/foreman-proxy/openscap/failed"
       --foreman-proxy-plugin-openscap-openscap-send-log-file="/var/log/foreman-proxy/openscap-send.log"
@@ -20,8 +19,8 @@
       --foreman-proxy-plugin-remote-execution-ssh-generate-keys=false
       --foreman-proxy-plugin-remote-execution-ssh-install-key=true
       --foreman-proxy-plugin-remote-execution-ssh-local-working-dir="/var/tmp"
-      --foreman-proxy-plugin-remote-execution-ssh-ssh-identity-dir={{ work_dir }}/service_ansible/cred
-      --foreman-proxy-plugin-remote-execution-ssh-ssh-identity-file=ansible_id_rsa
+      --foreman-proxy-plugin-remote-execution-ssh-ssh-identity-dir="/usr/share/foreman-proxy/.ssh"
+      --foreman-proxy-plugin-remote-execution-ssh-ssh-identity-file=id_rsa
       --foreman-proxy-plugin-remote-execution-ssh-ssh-keygen="/usr/bin/ssh-keygen"
  
   register: cmd

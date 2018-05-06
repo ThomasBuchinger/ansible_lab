@@ -20,7 +20,9 @@
     validate_certs: no
 - name: "[Prepare] Install foreman-installer"
   yum:
-    name: foreman-installer
+    name:
+      - foreman-installer
+      - foreman-release-scl
     state: present
 - name: "[Prepare] Create Foreman Directory"
   file:
@@ -40,11 +42,3 @@
   - "hammer.py"
   - "post-config-os.py"
 
-
-- name: "[----------- DIRTY FIX -----------------------] Set File permissions for keys"
-  file:
-    path: "{{ work_dir }}/service_ansible/cred/{{ item }}"
-    mode: 0644
-  with_items:
-    - ansible_id_rsa
-    - ansible_id_rsa.pub
