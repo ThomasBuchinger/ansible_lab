@@ -12,4 +12,4 @@
     expires: "{{ ssh_user_expires|default(omit) }}" 
     comment: "{{ ssh_user_comment|default(omit) }}" 
     create_home: "{{ ssh_user_create_home|default(omit) }}" 
-    append: "{{ ssh_user_append|default(omit) }}" 
+    append: "{{ ssh_user_append|default(omit) }}"
