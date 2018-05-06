@@ -1,0 +1,20 @@
+DEVICE="br0"
+ONBOOT="yes"
+TYPE="Bridge"
+DELAY="0"
+PEERDNS=yes
+PEERROUTES=yes
+DEFROUTE=yes
+ZONE=public
+BOOTPROTO="none"
+{% if ansible_default_ipv4.address is defined %}IPADDR={{ ansible_default_ipv4.address }} {% else %} {% endif %}
+
+{% if ansible_default_ipv4.netmask is defined %}NETMASK={{ ansible_default_ipv4.netmask }} {% else %} {% endif %}
+
+{% if ansible_default_ipv4.gateway is defined %}GATEWAY={{ ansible_default_ipv4.gateway }} {% else %} {% endif %}
+
+{% if ansible_dns.nameservers[0] is defined   %}DNS1={{ ansible_dns.nameservers[0] }} {% else %} {% endif %}
+
+{% if ansible_domain is defined   %}DOMAIN={{ ansible_domain }} {% else %} {% endif %}
+ 
+

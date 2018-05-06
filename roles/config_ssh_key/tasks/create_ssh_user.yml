@@ -1,0 +1,15 @@
+---
+- name: "[SSH] Create a User"
+  user:
+    name: "{{ ssh_user_name }}"
+    state: present
+    local: yes
+    home: "{{ ssh_user_home|default(omit) }}" 
+    shell: "{{ ssh_user_shell|default(omit) }}" 
+    uid: "{{ ssh_user_uid|default(omit) }}" 
+    group: "{{ ssh_user_group|default(omit) }}" 
+    groups: "{{ ssh_user_groups|default(omit) }}" 
+    expires: "{{ ssh_user_expires|default(omit) }}" 
+    comment: "{{ ssh_user_comment|default(omit) }}" 
+    create_home: "{{ ssh_user_create_home|default(omit) }}" 
+    append: "{{ ssh_user_append|default(omit) }}" 

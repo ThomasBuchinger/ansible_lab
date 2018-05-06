@@ -1,0 +1,27 @@
+---
+
+- name: "[Networking] Enable ip forwarding if not enabled"
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: "[Networking] Creating network bridge"
+  template:
+    src: networking_ifcfg-br0.j2
+    dest: /etc/sysconfig/network-scripts/ifcfg-br0
+    backup: no  
+  when: ansible_default_ipv4.interface != 'br0'
+  notify: restart_network
+
+- name: "[Networking] Add primary interface to bridge"
+  lineinfile:
+    regexp: "BRIDGE="
+    line: "BRIDGE=br0"
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}"
+    state: present
+  when: ansible_default_ipv4.interface != 'br0'
+  notify: restart_network
+

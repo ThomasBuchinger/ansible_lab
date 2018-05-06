@@ -1,0 +1,30 @@
+---
+- set_fact:
+    ssh_host: "{{ hostvars[ssh_remote_host]['ansible_host'] }}"
+  when: hostvars[ssh_remote_host]['ansible_host'] is defined
+
+
+- command: "ssh-keyscan -t rsa,ecdsa,ed25519 {{ ssh_host }}"
+  register: keys
+  changed_when: false
+  when: ssh_host is defined
+
+- name: "[SSH] Remove any existing SSH keys from known_hosts"
+  known_hosts:
+    name: "{{ ssh_host }}"
+    state: absent
+    path: "{{ ssh_known_hosts_path }}"
+  when: ssh_host is defined
+
+- name: "[SSH] Add current SSH keys to known_hosts"
+  known_hosts:
+    name: "{{ ssh_host }}"
+    key: "{{ ssh_item }}"
+    path: "{{ ssh_known_hosts_path }}"
+  with_items:
+    - "{{ keys.stdout_lines| select('search','ssh-') | list }}"
+  loop_control:
+    loop_var: "ssh_item"
+  when: ssh_host is defined
+
+

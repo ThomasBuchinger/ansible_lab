@@ -1,0 +1,4 @@
+---
+- name: "[SSH] NOOP"
+  debug:
+    msg: "This Role has no default operation. include one of the task files directly"

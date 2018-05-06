@@ -1,0 +1,10 @@
+---
+
+- name: "restart_network"
+  systemd:
+    name: network.service
+    state: restarted
+- name: "restart_libvirt"
+  systemd:
+    name: network.service
+    state: restarted
