@@ -10,7 +10,7 @@ This Ansible project automates the setup of essential infrastructure services an
 The heart piece os this project is the Ansible configuration itself. All the configuration is stored in git, including necessary credentials for external systems, which are encrypted using ansible-vault.  
 
 ### KVM Hypervisor
-The virtualization layer is implemented with KVM and libvirt. While it is no full blown datacenter virtualization solution like oVirt or VMware vCenter (which is sort-of-mandatory for API integrations), it has a way smaller footprint and combined with any libvirt compatible management. Day-to-day management tasks can be done via WebVirtManager and new VMs can be provisioned via Foreman.  
+The virtualization layer is implemented with KVM and libvirt. While it is no full blown datacenter virtualization solution like oVirt or VMware vCenter (which is sort-of-mandatory for API integrations), it has a way smaller footprint and libvirt serves as an excellent interface to other management interfaces. For day-to-day operations this lab uses WebVirtManager and new VMs are created via Foreman
 
 ### Openshift Origin
 The Upstream project Red Hat's Kubernetes distribution Openshift Enterprise. The setup is a single node development setup configured via 'oc cluster up', maybe a more production grade, multi-node setup will be added later
