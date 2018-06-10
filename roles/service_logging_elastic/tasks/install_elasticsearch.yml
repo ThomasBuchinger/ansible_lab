@@ -8,7 +8,7 @@
   with_items:
     - java
     - elasticsearch
-    - elasticsearch-curator
+    - elastic-curator
     - pcp-pmda-elasticsearch
 
 - name: "[elasticsearch] Create default configuration file"
