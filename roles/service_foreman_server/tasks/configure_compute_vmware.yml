@@ -1,0 +1,8 @@
+---
+- name: "[Configure] Create VCTR Link"
+  command: "python ./hammer.py compute-resource create --name {{ compute_resource }} --datacenter {{ compute_datacenter }} --provider vmware --server {{ vctr_host }} --user {{ vctr_user }} --password {{ vctr_password }} --url invalid"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1

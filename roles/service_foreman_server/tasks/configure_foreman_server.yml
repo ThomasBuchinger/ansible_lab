@@ -65,11 +65,11 @@
     --foreman-proxy-dhcp-leases="/var/lib/dhcpd/dhcpd.leases"
     --foreman-proxy-dhcp-manage-acls=true
     --foreman-proxy-dhcp-managed=true
-    --foreman-proxy-dhcp-nameservers={{ ipa_ip }}
+    --foreman-proxy-dhcp-nameservers={{ default_net_ns }}
     --foreman-proxy-dhcp-option-domain={{ ipa_domain }}
     
     --foreman-proxy-dns=true
-    --foreman-proxy-dns-forwarders={{ ipa_ip }}
+    --foreman-proxy-dns-forwarders={{ default_net_forwarders }}
     --foreman-proxy-dns-interface={{ ansible_default_ipv4.interface }}
     --foreman-proxy-dns-managed=true
     --foreman-proxy-dns-reverse=0.0.10.in-addr.arpa

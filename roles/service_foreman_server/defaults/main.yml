@@ -1,7 +1,13 @@
 ---
+skip_ipa_integration: no
+skip_compute_kvm: no
+skip_compute_vmware: no
+
 default_net_name: home
 default_net_id: 10.0.0.0
 default_net_gateway: 10.0.0.254
+default_net_ns: "{{ ipa_ip }}"
+default_net_forwarders: "{{ ipa_ip }}"
 default_host_group: VMs
 
 vm_description: "This VM is managed by Foreman and Ansible"
@@ -17,7 +23,7 @@ vm_memory: 2048
 vm_disk_size: 100
 vm_start: 1
 
-vctr_host: 0.0.0.0
+#vctr_host: 0.0.0.0
 vctr_user: Administrator@vsphere.local
 vctr_password: changeme
 compute_resource: "vctr-server"
@@ -26,3 +32,6 @@ compute_cluster: "cluster-name"
 compute_scsi: ParaVirtualSCSIController
 compute_datastore: "datastore0"
 compute_network: "{{ vm_network }}"
+
+kvm_name: kvm
+#kvm_host: root@0.0.0.0

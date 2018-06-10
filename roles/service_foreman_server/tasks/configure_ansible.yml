@@ -1,0 +1,59 @@
+---
+# FIX-1: If IPA client in installed, foreman-proxy needs to run with a valid shell
+# based on https://community.theforeman.org/t/foreman-freeipa-and-ansible-remote-execution/8964
+- name: "[FIX-1] Create Environment File"
+  copy:
+    content: "SHELL=/bin/bash"
+    dest: "{{ item }}"
+  with_items:
+    - "/etc/sysconfig/foreman-proxy"
+    - "/etc/sysconfig/smart_proxy_dynflow_core"
+- name: "[FIX-1] Configure systemd"
+  copy:
+    content: "[Service] EnvironemntFile=-/etc/sysconfig/smart_proxy_dynflow_core"
+    dest: "/etc/sysconfig/smart_proxy_dynflow_core"
+- name: "[FIX-1] Restart services"
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+  with_items:
+    - foreman-proxy.service 
+    - smart_proxy_dynflow_core.service
+
+# FIX-2: the default setup misses some files
+- name: "[FIX-2] Create .ansible directory on proxy"
+  file:
+    path: /usr/share/foreman-proxy/.ansible
+    owner: foreman-proxy
+    group: foreman-proxy
+    mode: 755
+    state: directory
+
+- name: "[ansible Repo] create git dir"
+  file:
+    path: "{{ work_dir }}/git"
+    state: directory
+    mode: 755
+- name: "[Ansible Repo] Clone git"
+  git:
+    repo: https://github.com/ThomasBuchinger/ansible_lab.git
+    dest: "{{ work_dir }}/git/ansible_lab"
+    update: yes
+
+- name: "[Ansible] Configure ansible.cfg"
+  ini_file:
+    path: /etc/ansible/ansible.cfg
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { section: "defaults", option: "roles_path", value: "{{ work_dir }}/git/ansible_lab/roles" }
+    - { section: "defaults", option: "callback_whitelist", value: "timer, mail, foreman" }
+    - { section: "callback_foreman", option: "url", value: "https://{{ ansible_fqdn }}" }
+    - { section: "callback_foreman", option: "ssl_cert", value: "/etc/foreman-proxy/ssl_cert.pem" }
+    - { section: "callback_foreman", option: "ssl_key", value: "/etc/foreman-proxy/ssl_key.pem" }
+    - { section: "callback_foreman", option: "verify_certs", value: "/etc/foreman-proxy/ssl_ca.pem" }
+#    - { section: "", option: "", value: "" }
+
+
+

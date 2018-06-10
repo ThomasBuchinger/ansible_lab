@@ -1,12 +1,4 @@
 ---
-- name: "[Configure] Create VCTR Link"
-  command: "python ./hammer.py compute-resource create --name {{ compute_resource }} --datacenter {{ compute_datacenter }} --provider vmware --server {{ vctr_host }} --user {{ vctr_user }} --password {{ vctr_password }} --url invalid"
-  args:
-    chdir: "{{ work_dir }}/service_foreman_server"
-  register: cmd
-  failed_when: cmd.rc >= 2
-  changed_when: cmd.rc == 1
-
 - name: "[Configure] Create domain: {{ ipa_domain }}"
   command: "python ./hammer.py domain create --name {{ ipa_domain }}"
   args:
@@ -14,12 +6,21 @@
   register: cmd
   failed_when: cmd.rc >= 2
 - name: "[Configure] Create Network {{ compute_network }}"
-  command: "python ./hammer.py subnet create --name {{ default_net_name }} --boot-mode=Static --dns-primary {{ ipa_ip }} --domains {{ ipa_domain }} --mask '255.255.255.0' --network {{ default_net_id }} --gateway={{ default_net_gateway }} --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}"
+  command: "python ./hammer.py subnet create --name {{ default_net_name }} --boot-mode=Static --dns-primary {{ default_net_ns }} --domains {{ ipa_domain }} --mask '255.255.255.0' --network {{ default_net_id }} --gateway={{ default_net_gateway }} --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   register: cmd
   failed_when: cmd.rc >= 2
   changed_when: cmd.rc == 1
+- name: "[Configure] Create Network provisioning"
+  command: "python ./hammer.py subnet create --name provisioning --boot-mode=Static --dns-primary {{ ansible_default_ipv4.address }} --domains {{ ipa_domain }} --mask '255.255.255.0' --network {{ default_net_id }} --gateway={{ default_net_gateway }} --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+
+
 
 - name: "[Configure] Copy Configuration templates into place"
   copy:
@@ -54,8 +55,16 @@
   failed_when: cmd.rc >= 2
   
 
+- name: "[Configure] Create Environment: production"
+  command: "python ./hammer.py environment create --name production"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  register: cmd
+  failed_when: cmd.rc >= 2
+  changed_when: cmd.rc == 1
+
 - name: "[Configure] Create Host Group: {{ default_host_group }}"
-  command: "python ./hammer.py hostgroup create --name {{ default_host_group }} --architecture x86_64 --domain {{ ipa_domain }} --environment production --operatingsystem 'CentOS' --medium 'CentOS mirror' --partition-table 'BUC-partition-var' --puppet-ca-proxy {{ ansible_fqdn }} --puppet-proxy {{ ansible_fqdn }} --root-pass 'changeme' --subnet '{{ default_net_name }}'"
+  command: "python ./hammer.py hostgroup create --name {{ default_host_group }} --architecture x86_64 --domain {{ ipa_domain }} --environment production --operatingsystem 'CentOS' --medium 'CentOS mirror' --partition-table 'BUC-partition-var' --root-pass 'changeme' --subnet '{{ default_net_name }}'"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   register: cmd
