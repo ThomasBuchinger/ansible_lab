@@ -1,19 +1,20 @@
 ---
 - hosts: openshift_nodes
   gather_facts: no
-  pre_tasks:
-  - include_role: 
-      name: utils
-      tasks_from: vm_create.yml
-    vars: 
-      vm_name: "{{ inventory_hostname_short }}"
-      vm_ip: "{{ ansible_host }}"
-      vm_memory: "16384"
-      vm_cpu: 4 
+#  tasks:
+#  - include_role: 
+#      name: utils
+#      tasks_from: vm_create.yml
+#    vars: 
+#      vm_name: "{{ inventory_hostname_short }}"
+#      vm_ip: "{{ ansible_host }}"
+#      vm_memory: "16384"
+#      vm_cpu: 4
+#    delegate_to: satellite 
 
 - hosts: openshift_nodes
   roles:
   - common
   - config_ipa_client
   - service_docker_daemon
-  - service_openshift_dev
+  - app_openshift_dev

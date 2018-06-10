@@ -15,7 +15,7 @@
     - yum-utils
     - ansible
     - pyOpenSSL
-    - centos-release-openshift-origin37
+    - centos-release-openshift-origin
     state: present
 - name: "[Install] Installing Openshift Origin release"
   yum:
