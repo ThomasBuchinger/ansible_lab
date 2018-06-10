@@ -1,18 +1,15 @@
 ---
+#- name: "[VMs] Configure hosts in VM group"
+#  hosts: vms
+#  roles:
+#    - common
+#    - config_ipa_client
+
 - import_playbook: free-ipa.yml
+- import_playbook: kvm.yml
 - import_playbook: satellite.yml
 
-- import_playbook: logging.yml
-
-- hosts: devel_seed
-  gather_facts: no
-  pre_tasks:
-  - include_role: 
-      name: utils
-      tasks_from: vm_create.yml
-    vars: 
-      vm_name: "{{ inventory_hostname_short }}"
-      vm_ip: "{{ ansible_host }}"
-      vm_memory: 8192
+- name: "[Logging] Configure central logging"
+  import_playbook: logging.yml
 
 #- include: rasp-m3.yml

@@ -1,6 +1,12 @@
 ---
-- name: "[SSH-Key] Manage SSH key for Foreman"
-  hosts: satellite
+- name: "[TMP-Foreman] Setup TMP Foreman"
+  vars: 
+    skip_compute_vmware: "yes"
+    skip_compute_kvm: "no"
+    skip_ipa_integration: "yes"
+    default_net_ns: "{{ ansible_default_ipv4.address }}"
+    default_net_forwarders: "10.0.0.254"
+  hosts: seed_foreman, satellite
   # Foreman uses ssh authentication to communicate with KVM
   # This play manages the .ssh directory for foreman and foreman-proxy:
   # install the ansible ssh key, scan network for kvm hosts and add their keys to known_hosts
@@ -33,7 +39,6 @@
       - "{{ groups['kvm_hypervisors'] }}"
     loop_control:
       loop_var: kvm_host
-
   # Setup SSH for Foreman
   - name: "[SSH-Key] Install the SSH key to Foreman"
     include_role:
@@ -62,6 +67,4 @@
 
   roles:
     - common
-    - config_ipa_client
-#    - service_ansible
     - service_foreman_server
