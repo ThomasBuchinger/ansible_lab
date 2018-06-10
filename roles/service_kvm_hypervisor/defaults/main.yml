@@ -1,0 +1,6 @@
+---
+libvirt_default_storage_dir: /var/lib/libvirt/images
+
+webvirtmgr_path: /usr/local/webvirtmgr
+webvirtmgr_bind: 0.0.0.0:8000
+
