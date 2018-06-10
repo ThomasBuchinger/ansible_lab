@@ -27,16 +27,13 @@
     name:
     - cockpit-docker
     - cockpit-selinux
-    - cockpit-sosreport
     - cockpit-storaged
     - cockpit-bridge
     - cockpit-ws
     - cockpit
-    - cockpit-kdump
     - cockpit-pcp
     - cockpit-system
     - cockpit-dashboard
-    - cockpit-networkmanager
     - cockpit-packagekit
     state: present
 - name: "[Cockpit] Configure Firewall"
