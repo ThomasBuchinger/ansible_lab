@@ -1,4 +1,5 @@
 ---
+ipa_server_force: false
 ipa_domain: example.com       # All lowercase. Actual DNS domain.
 ipa_admin_password: "changeme"
 ipa_dir_admin_password: "changeme"

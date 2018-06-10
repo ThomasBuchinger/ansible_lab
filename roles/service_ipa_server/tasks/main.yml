@@ -1,3 +1,7 @@
 ---
 - import_tasks: prepare_host.yml
+- import_tasks: force_ipa.yml
+  when: ipa_server_force == 'true'
+
 - import_tasks: setup.yml
+- import_tasks: configure_password_policy.yml

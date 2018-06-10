@@ -16,8 +16,3 @@
     name: "bind-utils"
     state: present
 
-- name: "[Prepare] Verify DNS Settungs"
-  command: "nslookup www.google.at"
-  failed_when: result.rc == 1
-  changed_when: result.rc != 0
-  register: result

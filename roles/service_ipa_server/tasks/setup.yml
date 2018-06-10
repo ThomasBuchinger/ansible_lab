@@ -1,9 +1,15 @@
 ---
+- name: "[Verify] Verify DNS Settings"
+  command: "nslookup www.google.at"
+  failed_when: result.rc == 1
+  changed_when: result.rc != 0
+  register: result
 
 - name: "[Setup] Installing packages"
   yum:
     name: "{{ ipa_packages }}" 
     state: present
+
 - name: "[Setup] Running IPA setup command"
   command: "{{ ipa_base_command }} --no-ntp --setup-dns --auto-reverse --admin-password {{ ipa_admin_password }} --ds-password {{ ipa_dir_admin_password }} --domain {{ ipa_domain}} --realm {{ ipa_domain|upper }} --no-host-dns --mkhomedir --forwarder {{ipa_dns_forwarder }} --log-file {{ ipa_log_file }}"
   args:
@@ -36,4 +42,3 @@
     ipa_pass: "{{ ipa_admin_password }}"
     validate_certs: no
 
-- import_tasks: configure_password_policy.yml

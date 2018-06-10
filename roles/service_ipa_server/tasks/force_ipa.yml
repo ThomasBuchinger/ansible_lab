@@ -1,0 +1,13 @@
+---
+- name: "[DNS] Reset DNS server to {{ ipa_dns_forwarder }}"
+  lineinfile:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}"
+    line: "DNS1={{ ipa_dns_forwarder }}"
+    regexp: "DNS1"
+  register: interface_settings
+
+- name: "[DNS] restart networking"
+  systemd:
+    name: network.service
+    state: restarted
+  when: interface_settings.changed
