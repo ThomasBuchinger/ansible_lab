@@ -1,0 +1,20 @@
+---
+- name: "[RedHat] Register system to RHSM"
+  redhat_subscription:
+    state: present
+    username: "{{ rhsm_user }}"
+    password: "{{ rhsm_password }}"
+    autosubscribe: true
+
+- name: "[RedHat] Enable extras Repo"
+  rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  with_items:
+    - rhel-7-server-optional-rpms
+    - rhel-7-server-extras-rpms
+
+- name: "[EPEL] Install EPEL Repository"
+  yum: 
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
