@@ -1,2 +1,3 @@
 ---
 ipa_client_force: 'false'
+skip_ipa_integration: "no"

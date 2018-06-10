@@ -1,0 +1,37 @@
+---
+- name: "[Enrollment] Check IPA installation status"
+  shell: "if [ -f /etc/sssd/sssd.conf ]; then cat /etc/sssd/sssd.conf; else echo not installed; fi"
+  register: sssd_conf
+  ignore_errors: True
+  changed_when: False
+
+# Force DNS server to be the ipa_ip
+#
+- name: "[DNS] Set DNS server to {{ ipa_ip }}"
+  lineinfile:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}"
+    line: "DNS1={{ ipa_ip }}"
+    regexp: "DNS1"
+  register: interface_settings
+- name: "[DNS] restart networking"
+  systemd:
+    name: network.service
+    state: restarted
+  when: interface_settings.changed
+
+
+
+# Uninstall ipa client, if force is set
+#
+# If enrolled, uninstall client
+- name: "[Unroll] Uninstall IPA client if forced"
+  command: "ipa-client-install --uninstall"
+  when: "'ipa_server' in sssd_conf.stdout"
+  register: cmd_ipa_uninstalled
+
+- name: "[Unroll] Refresh IPA client installation status"
+  shell: "if [ -f /etc/sssd/sssd.conf ]; then cat /etc/sssd/sssd.conf; else echo not installed; fi"
+  register: sssd_conf
+  ignore_errors: True
+  changed_when: False
+
