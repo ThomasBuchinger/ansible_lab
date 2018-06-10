@@ -1,8 +1,0 @@
----
-ansible_path: "{{ work_dir }}/service_ansible"
-ansible_private_key_name: "ansible_id_rsa"
-ansible_packages:
-  - git
-  - ansible
-  - python-psphere
-  - python2-pyvmomi
