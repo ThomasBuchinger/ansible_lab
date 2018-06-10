@@ -1,0 +1,16 @@
+---
+#vdo_name: vdo1
+#dev_name: sdb
+#mountpoint: /mnt
+
+vdo_lv_name: "lv_{{ vdo_name }}"
+
+#vdo_compression: enabled
+#vdo_deduplication: enabled
+vdo_scale: 10
+vdo_slabsize: 256M
+vdo_vg_name: vg_vdo_data
+vdo_lv_size: '100%VG'
+vdo_fs: xfs
+
+

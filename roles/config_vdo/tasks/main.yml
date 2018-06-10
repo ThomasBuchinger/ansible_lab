@@ -1,0 +1,44 @@
+---
+- name: "[VDO] Install vdo packages"
+  yum:
+    name: vdo
+    state: present
+- name: "[VDO] Create vdo device {{ vdo_name }} on {{ dev_name }}"
+  vdo:
+    name: "{{ vdo_name }}"
+    device: "/dev/{{ dev_name }}"
+    logicalsize: "'{{ ansible_devices[dev_name].sectors|int  * vdo_scale|int }} S'"
+    indexmem: 1
+#    logicalsize: "400G"
+    compression: "{{ vdo_compression|default(omit) }}"
+    deduplication: "{{ vdo_deduplication|default(omit) }}"
+    activated: yes
+    running: yes
+    state: present
+    slabsize: "{{ vdo_slabsize }}"
+
+- name: "[LVM] Create LVM volume group"
+  lvg:
+    vg: "{{ vdo_vg_name }}"
+    pvs: "/dev/mapper/{{ vdo_name }}"
+    state: present
+- name: "[LVM] Create logical volume"
+  lvol:
+    lv: "{{ vdo_lv_name }}"
+    size: "{{ vdo_lv_size }}"
+    state: present
+    vg: "{{ vdo_vg_name }}"
+- name: "[LVM] Create filesystem"
+  filesystem:
+    dev: "/dev/mapper/{{ vdo_vg_name }}-{{ vdo_lv_name }}"
+    fstype: "{{ vdo_fs }}"
+    resizefs: yes
+
+- name: "[Mount] Mount volume"
+  mount:
+    fstype: "{{ vdo_fs }}"
+    opts: "defaults,x-systemd.requires=vdo.service"
+    path: "{{ mountpoint }}"
+    src: "/dev/mapper/{{ vdo_vg_name }}-{{ vdo_lv_name }}"
+    state: mounted
+
