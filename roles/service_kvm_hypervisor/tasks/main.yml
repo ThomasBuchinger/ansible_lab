@@ -17,6 +17,11 @@
     enabled: yes
     state: started
 
+- name: "[Install] Configure KVM Kernel Params"
+  template:
+    src: kvm-kernel_params.conf
+    dest: /etc/modprobe.d/kvm.conf
+
 - import_tasks: network_bridge.yml
 - import_tasks: storage_default.yml
 - import_tasks: management_setup.yml
