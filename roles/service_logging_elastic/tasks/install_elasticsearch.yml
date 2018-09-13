@@ -39,12 +39,22 @@
     src: elasticsearch_systemd.conf.j2
     dest: /etc/systemd/system/elasticsearch.service.d/limit_memory.conf
   notify: restart_elasticsearch
+
+
+
+- name: "[elasticsearch] Uninstall Plugins, in case elasticsearch has been updated"
+  elasticsearch_plugin:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - ingest-geoip
+    - ingest-user-agent
 - name: "[elasticsearch] Install Plugins"
   elasticsearch_plugin:
     name: "{{ item }}"
     state: present
   with_items:
-    - ingest-geoip
+    - "--batch ingest-geoip"
     - ingest-user-agent    
   notify: restart_elasticsearch
 
