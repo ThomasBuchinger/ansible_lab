@@ -21,12 +21,13 @@
     path: /etc/ssh/sshd_config
     line: 'UseDNS no'
     regexp: '#?UseDNS '
+  tags:
+    - sshd
 
 - name: "[Cockpit] Install Cockpit"
   yum:
     name:
     - cockpit-docker
-    - cockpit-selinux
     - cockpit-storaged
     - cockpit-bridge
     - cockpit-ws
@@ -36,17 +37,25 @@
     - cockpit-dashboard
     - cockpit-packagekit
     state: present
+  tags:
+    - cockpit
 - name: "[Cockpit] Configure Firewall"
   firewalld:
     service: cockpit
     immediate: true
     permanent: true
     state: enabled
+  tags:
+    - cockpit
+    - firewall
 - name: "[Cockpit] Enable Cockpit "
   systemd:
     name: cockpit.socket
     state: started
     enabled: true
+  tags:
+    - cockpit
+    - systemd
 
 
 #- name: "Install Debian Tasks"
