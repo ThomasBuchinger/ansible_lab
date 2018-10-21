@@ -11,5 +11,6 @@ elastic_kibana_host: "localhost:5601"
 
 elastic_filebeat_modules:
   - system
+  - auditd
 elastic_metricbeat_modules:
   - system

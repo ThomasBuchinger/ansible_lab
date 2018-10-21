@@ -1,7 +1,19 @@
 ---
 - hosts: logging
+  vars:
+    elastic_filebeat_modules:
+      - system
+      - auditd
+      - apache2
+      - elasticsearch
+      - kibana
+  
   roles: 
     - service_logging_elastic
+  tasks:
+  - include_role:
+      name: service_logging_elastic
+      tasks_from: beats.yml
 
 - hosts: all
   tasks:
