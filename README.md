@@ -28,7 +28,7 @@ Note: Additional IPA modules are included, since the original modules do not cov
 A small Elastic-Stack (Beats, elasticsearch and Kibana) is responsible for log and status monitoring. The push architecture makes it a perfect match for a lab, where services come and go and the dashboards shipped by Elastic cover most monitoring needs
 
 ### Openshift Origin
-The Upstream project Red Hat's Kubernetes distribution Openshift Enterprise. The setup is a single node development setup configured via 'oc cluster up', maybe a more production grade, multi-node setup will be added later
+The Upstream project Red Hat's Kubernetes distribution Openshift Enterprise. The setup is a single node development setup configured with the help of the excellent installation-script by gshipley
 
 ### Additional features
 * All nodes run Cockpit for GUI based remote administration

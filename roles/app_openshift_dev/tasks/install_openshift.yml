@@ -1,0 +1,43 @@
+---
+- name: "[Prepare] Installing packages"
+  yum:
+    name: 
+    - wget 
+    - git
+    - net-tools
+    - bind-utils
+    - iptables-services 
+    - bridge-utils 
+    - bash-completion 
+    - kexec-tools 
+    - sos 
+    - psacct
+    - yum-utils
+    - ansible
+    - pyOpenSSL
+    - socat
+    - centos-release-openshift-origin
+    state: present
+- name: "[Install] Installing Openshift Origin release"
+  yum:
+    name: 
+    - atomic
+    - origin-clients
+
+# Clone the Repo
+#
+- name: '[Install] Clone gshipley/installcentos from github'
+  git:
+    repo: https://github.com/gshipley/installcentos.git
+    dest: "{{ work_dir }}/installcentos"
+    update: no
+
+- name: "[Install] Running the installation Playbook. This will take at leat 15 minutes"
+  command: "{{ work_dir }}/installcentos/install-openshift.sh"
+  environment:
+    DOMAIN: "{{ ansible_default_ipv4.address }}.nip.io"
+    USERNAME: developer
+    PASSWORD: changeme
+    INTERACTIVE: false
+  async: 3600
+  poll: 60
