@@ -14,7 +14,7 @@
 
 - hosts: openshift_nodes
   roles:
-  - common
-  - config_ipa_client
+#  - common
+#  - config_ipa_client
   - service_docker_daemon
-  - app_openshift_gshipley
+  - app_openshift_dev

@@ -32,7 +32,7 @@
     dest: "{{ work_dir }}/installcentos"
     update: no
 
-- name: "[Install] Running the installation Playbook. This will take at leat 15 minutes"
+- name: "[Install] Running the installation Playbook. This will take at least 15 minutes"
   command: "{{ work_dir }}/installcentos/install-openshift.sh"
   environment:
     DOMAIN: "{{ ansible_default_ipv4.address }}.nip.io"
