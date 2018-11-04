@@ -13,7 +13,6 @@
     - sos 
     - psacct
     - yum-utils
-    - ansible
     - pyOpenSSL
     - socat
     - centos-release-openshift-origin
@@ -23,6 +22,8 @@
     name: 
     - atomic
     - origin-clients
+
+- import_tasks: "fix_ansible-version.yml"
 
 # Clone the Repo
 #
@@ -34,6 +35,8 @@
 
 - name: "[Install] Running the installation Playbook. This will take at least 15 minutes"
   command: "{{ work_dir }}/installcentos/install-openshift.sh"
+  args: 
+    chdir: "{{ work_dir }}/installcentos"
   environment:
     DOMAIN: "{{ ansible_default_ipv4.address }}.nip.io"
     USERNAME: developer
