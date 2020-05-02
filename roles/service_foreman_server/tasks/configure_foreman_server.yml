@@ -9,7 +9,6 @@
       --enable-foreman-cli-openscap
       --enable-foreman-plugin-ansible
       --enable-foreman-plugin-cockpit
-      --enable-foreman-plugin-docker
       --enable-foreman-plugin-hooks
       --enable-foreman-plugin-openscap
       --enable-foreman-plugin-ovirt-provision
@@ -23,8 +22,8 @@
       --enable-foreman-compute-vmware
       --enable-foreman-compute-libvirt
 
-    --foreman-admin-password={{ foreman_admin_password }}
-    --foreman-admin-email=thomas.buchinger@outlook.com
+    --foreman-initial-admin-password {{ foreman_admin_password }}
+    --foreman-initial-admin-email thomas.buchinger@outlook.com
     --foreman-db-manage=true
     --foreman-db-type=postgresql
       

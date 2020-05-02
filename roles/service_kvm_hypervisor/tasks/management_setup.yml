@@ -13,9 +13,7 @@
 #    value: "{{ work_dir }}/service_kvm_hypervisor/webvirtmgr" 
 - name: "[WebVirtManager] Install WebVirtManager RPM dependencies"
   yum:
-    name: "{{ item }}"
-    state: present
-  with_items:
+    name:
     - git 
     - python-pip 
     - libvirt-python 
@@ -24,6 +22,7 @@
     - python-devel
     - gcc
     - numpy
+    state: present
 - name: "[WebVirtManager] Clone GIT Repo"
   git:
     repo: git://github.com/retspen/webvirtmgr.git

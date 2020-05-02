@@ -27,7 +27,7 @@
 - name: "[Cockpit] Install Cockpit"
   yum:
     name:
-    - cockpit-docker
+#    - cockpit-session-recording
     - cockpit-storaged
     - cockpit-bridge
     - cockpit-ws
