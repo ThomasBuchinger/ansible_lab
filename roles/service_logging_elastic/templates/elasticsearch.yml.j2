@@ -15,6 +15,9 @@
 # Use a descriptive name for your cluster:
 #
 cluster.name: central-logging
+
+cluster.initial_master_nodes:
+  - {{ ansible_hostname }}
 #
 # ------------------------------------ Node ------------------------------------
 #

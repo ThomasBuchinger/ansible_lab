@@ -3,13 +3,11 @@
 
 - name: "[elasticsearch] Install elaticsearch and dependencies"
   yum:
-    name: "{{ item }}"
-    state: present
-  with_items:
+    name:
     - java
     - elasticsearch
-    - elastic-curator
     - pcp-pmda-elasticsearch
+    state: present
 
 - name: "[elasticsearch] Create default configuration file"
   template:
@@ -39,25 +37,6 @@
     src: elasticsearch_systemd.conf.j2
     dest: /etc/systemd/system/elasticsearch.service.d/limit_memory.conf
   notify: restart_elasticsearch
-
-
-
-- name: "[elasticsearch] Uninstall Plugins, in case elasticsearch has been updated"
-  elasticsearch_plugin:
-    name: "{{ item }}"
-    state: absent
-  with_items:
-    - ingest-geoip
-    - ingest-user-agent
-- name: "[elasticsearch] Install Plugins"
-  elasticsearch_plugin:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - "--batch ingest-geoip"
-    - ingest-user-agent    
-  notify: restart_elasticsearch
-
 
 - name: "[elasticsearch] Enable elasticsearch service"
   systemd:

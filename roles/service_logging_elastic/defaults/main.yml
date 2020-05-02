@@ -1,5 +1,5 @@
 ---
-elastic_major_version: 6
+elastic_major_version: 7
 elastic_default_primaries: 1
 elastic_default_replicas: 0
 elastic_log_retention: 30

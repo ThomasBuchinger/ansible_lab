@@ -3,10 +3,9 @@
 
 - name: "[Install] Install Kibana"
   yum:
-    name: "{{ item }}"
-    state: present
-  with_items:
+    name:
     - kibana
+    state: present
 
 - name: "[Kibana] Create default configuration file"
   template:
@@ -22,6 +21,7 @@
   with_items:
     - kibana
     - httpd
+  
 - name: "[Kibana] Configure firewall"
   firewalld:
     port: "5601/tcp"
