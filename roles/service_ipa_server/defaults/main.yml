@@ -11,4 +11,10 @@ ipa_packages:
   - bind
   - bind-dyndb-ldap
   - mod_auth_kerb
+ipa_packages_rhel8:
+  - ipa-server
+  - ipa-server-dns
+  - bind
+  - bind-dyndb-ldap
+  - mod_auth_gssapi
 ipa_log_file: "/var/log/ansible-ipa-server-install.log"

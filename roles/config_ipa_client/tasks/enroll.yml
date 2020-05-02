@@ -1,4 +1,11 @@
 ---
+
+- name: "[Setup] Enable IDM Apstream"
+  dnf:
+    name: "@idm:DL1/client" 
+    state: present
+  when: ansible_distribution_major_version == '8'
+
 - name: "[Prepare] Install packages"
   yum:
     name: 
