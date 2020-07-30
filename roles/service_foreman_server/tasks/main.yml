@@ -4,7 +4,6 @@
 - import_tasks: configure_foreman_server.yml
 - import_tasks: configure_foreman_proxy-plugins.yml
 
-- import_tasks: configure_resources.yml
 #- import_tasks: configure_compute_vmware.yml
 #  when: 
 #   - vctr_host is defined
@@ -13,6 +12,7 @@
   when: 
     - kvm_host is defined
     - not skip_compute_kvm == "yes"
+- import_tasks: configure_resources.yml
 
 - import_tasks: ext_ipa.yml
   when: not skip_ipa_integration == "yes"

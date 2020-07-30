@@ -6,14 +6,7 @@
   register: cmd
   failed_when: cmd.rc >= 2
 - name: "[Configure] Create Network {{ compute_network }}"
-  command: "python ./hammer.py subnet create --name {{ default_net_name }} --boot-mode=Static --dns-primary {{ default_net_ns }} --domains {{ ipa_domain }} --mask '255.255.255.0' --network {{ default_net_id }} --gateway={{ default_net_gateway }} --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}"
-  args:
-    chdir: "{{ work_dir }}/service_foreman_server"
-  register: cmd
-  failed_when: cmd.rc >= 2
-  changed_when: cmd.rc == 1
-- name: "[Configure] Create Network provisioning"
-  command: "python ./hammer.py subnet create --name provisioning --boot-mode=Static --dns-primary {{ ansible_default_ipv4.address }} --domains {{ ipa_domain }} --mask '255.255.255.0' --network {{ default_net_id }} --gateway={{ default_net_gateway }} --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}"
+  command: "python ./hammer.py subnet create --name {{ default_net_name }} --boot-mode=Static --dns-primary {{ ipa_ip }} --dns-secondary {{ default_net_gateway }} --domains {{ ipa_domain }} --mask '255.255.255.0' --network {{ default_net_id }} --gateway={{ default_net_gateway }} --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   register: cmd
@@ -40,20 +33,42 @@
   with_fileglob:
     - "*.cfg"
 
-- name: "[Configure] Create OS: CentOS"
-  command: "python ./hammer.py os create --name 'CentOS' --architectures 'x86_64' --description 'CentOS' --family 'Redhat' --major 7 --media 'CentOS mirror' --password-hash SHA512"
+
+- name: "[Configure] Create OS: CentOS 7"
+  command: "python ./hammer.py os create --name 'Centos7' --architectures 'x86_64' --description 'Centos7' --family 'Redhat' --major 7 --media 'CentOS mirror' --password-hash SHA512"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   register: os_cmd
   failed_when: os_cmd.rc >= 2
-- name: "[Configure] Configure OS: CentOS"
-  command: "python ./post-config-os.py --os 'CentOS' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition BUC-partition-tiny BUC-partition-var BUC-partition-opt"
+- name: "[Configure] Configure OS: CentOS 7"
+  command: "python ./post-config-os.py --os 'Centos7' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition BUC-partition-tiny BUC-partition-var BUC-partition-opt"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   when: os_cmd.changed
   register: cmd
   failed_when: cmd.rc >= 2
-  
+
+
+- name: "[Configure] Create Install Media: CentOS 8"
+  command: "python ./hammer.py medium create --name 'Centos8' --os-family 'Redhat' --path 'http://mirror.centos.org/centos/$major/BaseOS/$arch/os/'"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  register: os_cmd
+  failed_when: os_cmd.rc >= 2
+- name: "[Configure] Create OS: CentOS 8"
+  command: "python ./hammer.py os create --name 'Centos8' --architectures 'x86_64' --description 'Centos8' --family 'Redhat' --major 8 --media 'Centos8' --password-hash SHA512"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  register: os_cmd
+  failed_when: os_cmd.rc >= 2
+- name: "[Configure] Configure OS: CentOS 8"
+  command: "python ./post-config-os.py --os 'Centos8' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition BUC-partition-tiny BUC-partition-var BUC-partition-opt"
+  args:
+    chdir: "{{ work_dir }}/service_foreman_server"
+  when: os_cmd.changed
+  register: cmd
+  failed_when: cmd.rc >= 2
+
 
 - name: "[Configure] Create Environment: production"
   command: "python ./hammer.py environment create --name production"
@@ -64,7 +79,34 @@
   changed_when: cmd.rc == 1
 
 - name: "[Configure] Create Host Group: {{ default_host_group }}"
-  command: "python ./hammer.py hostgroup create --name {{ default_host_group }} --architecture x86_64 --domain {{ ipa_domain }} --environment production --operatingsystem 'CentOS' --medium 'CentOS mirror' --partition-table 'BUC-partition-var' --root-pass 'changeme' --subnet '{{ default_net_name }}'"
+  command:
+    argv:
+      - python
+      - ./hammer.py
+      - hostgroup
+      - create 
+      - --name
+      - "{{ default_host_group }}"
+      - --architecture
+      - x86_64
+      - --domain
+      - "{{ ipa_domain }}"
+      - --environment
+      - production
+      - --operatingsystem
+      - Centos8
+      - --medium
+      - Centos8
+      - --compute-resource
+      - "{{ foreman_default_compute }}"
+      - --pxe-loader
+      - PXELinux UEFI
+      - --partition-table
+      - BUC-partition-tiny
+      - --root-pass
+      - changeme
+      - --subnet
+      - "{{ default_net_name }}"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   register: cmd

@@ -1,4 +1,6 @@
 ---
+#    --foreman-plugin-ovirt-provision-package="tfm-rubygem-ovirt_provision_plugin"
+#    --foreman-plugin-tasks-package="tfm-rubygem-foreman-tasks"
 - name: "[Setup] Run Foreman-Installer"
   command: >
     foreman-installer --detailed-exitcodes  --no-colors
@@ -8,7 +10,6 @@
       --enable-foreman-cli 
       --enable-foreman-cli-openscap
       --enable-foreman-plugin-ansible
-      --enable-foreman-plugin-cockpit
       --enable-foreman-plugin-hooks
       --enable-foreman-plugin-openscap
       --enable-foreman-plugin-ovirt-provision
@@ -25,7 +26,6 @@
     --foreman-initial-admin-password {{ foreman_admin_password }}
     --foreman-initial-admin-email thomas.buchinger@outlook.com
     --foreman-db-manage=true
-    --foreman-db-type=postgresql
       
     --foreman-compute-ec2-version='installed'
     --foreman-compute-gce-version='installed'
@@ -35,9 +35,7 @@
     --foreman-compute-rackspace-version='installed'
     --foreman-compute-vmware-version='installed'
 
-    --foreman-plugin-ovirt-provision-package="tfm-rubygem-ovirt_provision_plugin"
 
-    --foreman-plugin-tasks-package="tfm-rubygem-foreman-tasks"
 
     --foreman-proxy-dir="/usr/share/foreman-proxy"
     --foreman-proxy-foreman-base-url=https://{{ ansible_fqdn }}

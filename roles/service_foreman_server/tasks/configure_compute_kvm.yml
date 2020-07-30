@@ -6,3 +6,7 @@
   register: cmd
   failed_when: cmd.rc >= 2
   changed_when: cmd.rc == 1
+
+- name: "[Configure] Set KVM as default Compute Resource"
+  set_fact:
+    foreman_default_compute: "{{ kvm_name }}"

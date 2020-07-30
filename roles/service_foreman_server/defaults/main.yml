@@ -1,4 +1,6 @@
 ---
+foreman_version: latest
+
 skip_ipa_integration: no
 skip_compute_kvm: no
 skip_compute_vmware: no

@@ -34,11 +34,11 @@ def add_partition_table(os_id, ptable_id):
 # Link a config-tempate to the OS and set is as the default
 #
 def set_default_template(os_id, tmpl_id):
-  stdout, status = call_process("hammer os add-config-template --id {} --config-template-id {}", os_id, tmpl_id)
+  stdout, status = call_process("hammer os add-provisioning-template --id {} --provisioning-template-id {}", os_id, tmpl_id)
   if status != 0:
     sys.stderr.write(stdout)
     raise RuntimeError("Failed to add Configtemplate to OS")
-  stdout, status = call_process("hammer os set-default-template --id {} --config-template-id {}", os_id, tmpl_id)
+  stdout, status = call_process("hammer os set-default-template --id {} --provisioning-template-id {}", os_id, tmpl_id)
   if status != 0:
     sys.stderr.write(stdout)
     raise RuntimeError("Failed to set template as default")

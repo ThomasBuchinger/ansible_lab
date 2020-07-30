@@ -1,40 +1,66 @@
 ---
-- name: "[Prepare] Set FQDN"
+- name: "Prepare Host / Set FQDN"
   hostname:
     name: "{{ ansible_hostname }}.{{ ipa_domain }}"
 
-- name: "[Prepare] Set /etc/hosts"
+- name: "Prepare Host / Set /etc/hosts"
   lineinfile:
     dest: /etc/hosts
     regexp: "{{ ansible_default_ipv4.address }}"
     line: "{{ ansible_default_ipv4.address }}    {{ ansible_fqdn }} {{ ansible_hostname }}"
     backup: no
 
-- name: "[Prepare] Installing release repositories"
+- name: "Prepare Host / Install EPEL 7 Repo for SCL & python"
+  dnf:
+    name:
+#    - "@python36:3.6/common"
+#    - "@ruby:2.5/common"
+    - epel-release
+    - http://yum.puppet.com/puppet6-release-el-8.noarch.rpm
+    - "https://yum.theforeman.org/releases/{{ foreman_version }}/el8/x86_64/foreman-release.rpm"
+    state: present
+    validate_certs: no
+  when: ansible_distribution_major_version == "8"
+#- name: Prepare Host / Configure Python
+#  alternatives:
+#    name: python
+#    path: /usr/bin/python3
+#  when: ansible_distribution_major_version == "8"
+  
+- name: "Prepare Host / Install EPEL"
   yum:
     name:
       - epel-release
-      - http://yum.puppet.com/puppet5-release-el-7.noarch.rpm
-#      - https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm
+      - http://yum.puppet.com/puppet6-release-el-7.noarch.rpm
       - https://yum.theforeman.org/releases/latest/el7/x86_64/foreman-release.rpm
+      - foreman-release-scl
     state: present
     validate_certs: no
-- name: "[Prepare] Install foreman-installer"
+  when: ansible_distribution_major_version == "7"
+
+#- name: "Prepare Host / Installing release repositories"
+#  yum:
+#    name:
+#      - http://yum.puppet.com/puppet6-release-el-7.noarch.rpm
+#      - https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm
+#      - "https://yum.theforeman.org/releases/{{ foreman_version }}/el7/x86_64/foreman-release.rpm"
+#    state: present
+#    validate_certs: no
+- name: "Prepare Host / Install foreman-installer"
   yum:
     name:
       - foreman-installer
-      - foreman-release-scl
     state: present
-- name: "[Prepare] Create Foreman Directory"
+- name: "Prepare Host / Create Foreman Directory"
   file:
     name: /etc/foreman-installer/scenarios.d/
     state: directory
 
-- name: "[Prepare] Create work directory"
+- name: "Prepare Host / Create work directory"
   file:
     name: "{{ work_dir }}/service_foreman_server"
     state: directory
-- name: "[Prepare] Copy helper scripts to target"
+- name: "Prepare Host / Copy helper scripts to target"
   copy:
     src: "{{ item }}"
     dest: "{{ work_dir }}/service_foreman_server/{{ item}}"
