@@ -1,0 +1,17 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn-storage
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }}
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://github.com/ThomasBuchinger/argo-playground.git'
+    targetRevision: add-longhorn-storage
+    path: longhorn
+    plugin:
+      name: kustomize-with-local-plugins
+  project: default

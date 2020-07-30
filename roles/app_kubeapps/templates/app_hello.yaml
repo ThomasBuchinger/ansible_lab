@@ -1,0 +1,26 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }}
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://github.com/ThomasBuchinger/argo-playground.git'
+    targetRevision: HEAD
+    path: helloworld
+  directory:
+    jsonnet:
+      extVars:
+        - name: ingress_name
+          value: hello
+        - name: ingress_domain
+          value: "{{ clustername }}.{{ ipa_domain }}"
+        - name: ingress_ip
+          value: "{{ ansible_default_ipv4.address }}"
+        - name: ingress_service_name
+          value: hello-service
+  project: default

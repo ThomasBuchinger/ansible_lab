@@ -1,0 +1,28 @@
+
+- name: "Apps / {{ name }} / Create Ingress in namespace {{ ns }}"
+  command:
+    stdin: |
+      apiVersion: networking.k8s.io/v1beta1
+      kind: Ingress
+      metadata:
+        name: {{ name }}
+        namespace: {{ ns }}
+        annotations: {{ annotations | default(dict()) }}
+      spec:
+        rules:
+          - host: {{ name }}.{{ clustername }}.{{ ipa_domain }} 
+            http:
+              paths:
+                - path: /
+                  backend:
+                    serviceName: {{ service_name }}
+                    servicePort: {{ service_port | default(80) }}
+          - host: {{ name }}.{{ ansible_default_ipv4.address }}.nip.io
+            http:
+              paths:
+                - path: /
+                  backend:
+                    serviceName: {{ service_name }}
+                    servicePort: {{ service_port | default(80) }}
+    argv: [ "kubectl", "apply", "-f", "-"]
+

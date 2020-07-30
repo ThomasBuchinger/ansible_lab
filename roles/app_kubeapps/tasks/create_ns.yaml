@@ -1,0 +1,13 @@
+
+
+
+- name: "Apps / Create Namespace: {{ ns }}"
+  command:
+    stdin: |
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ ns }}"
+        annotations: {{ annotations | default(dict()) }}
+    argv: [ "kubectl", "apply", "-f", "-"]
+

@@ -1,0 +1,85 @@
+
+# ===== ArgoCD ==========================================================
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ArgoCD
+metadata:
+  name: buc-argocd
+  namespace: my-argocd-operator
+spec:
+  server:
+    insecure: true
+  usersAnonymousEnabled: true 
+  rbac:
+    defaultPolicy: 'role:admin'
+  kustomizeBuildOptions: --enable_alpha_plugins
+  configManagementPlugins: |
+    - name: kustomize-with-local-plugins
+      generate:
+        command: ["sh", "-c"]
+        args: ["KUSTOMIZE_PLUGIN_HOME=$(pwd)/kustomize/plugin kustomize build --enable_alpha_plugins"]
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kustomize-urldownloader
+data:
+  UrlDownloader: |
+    #!/usr/bin/env python3
+    import urllib3
+    import yaml
+    import sys
+    res_name = sys.argv[1]
+    res_url = sys.argv[2]
+
+    http = urllib3.PoolManager()
+    r = http.request('GET', res_url)
+
+    out = r.data.decode('unicode_escape').split('---')
+    out = list(map(lambda x: yaml.dump(yaml.safe_load(x)), out))
+
+    print("\n---\n".join(out))
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: argocd-admin
+subjects:
+  - kind: ServiceAccount
+    name: argocd-application-controller
+    namespace: my-argocd-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: argocd-server-deploy-restart
+subjects:
+  - kind: ServiceAccount
+    name: argocd-server
+    namespace: my-argocd-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argocd-server
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: argocd-server-clusteradmin-test
+subjects:
+  - kind: ServiceAccount
+    name: argocd-server
+    namespace: my-argocd-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+

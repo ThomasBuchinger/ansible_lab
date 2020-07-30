@@ -1,0 +1,139 @@
+
+- name: Apps / ALL / Create work_dir
+  file:
+    path: "{{ work_dir }}/app_kube"
+    state: directory
+
+- import_tasks: app_olm.yaml
+
+# === ArgoCD =======================================================
+- name: "Apps / ArgoCD / Create App"
+  vars:
+    app: ArgoCD
+    ns: my-argocd-operator 
+  block:
+  - import_tasks: manifest_apply_ns.yaml
+    vars:
+      step_desc: Deploy ArgoCD CR and RBAC 
+      manifest: argocd.yaml
+  - import_tasks: create_ingress.yaml
+    vars:
+      name: argocd
+      service_name: buc-argocd-server
+
+
+# === Hello ========================================================
+- import_tasks: manifest_apply_global.yaml
+  vars:
+    app: Hello
+    step_desc: Deploy Hello World to ArgoCD
+    manifest: app_hello.yaml
+    ns: default
+
+# === Rev Proxy ====================================================
+- name: "Apps / Reverse Proxy / Create App"
+  vars:
+    app: revproxy
+    ns: traefik
+  when: true
+  block:
+  - import_tasks: create_ns.yaml
+
+# === Monitoring ====================================================
+- name: "Apps / Monitoring / Create App"
+  vars:
+    app: Monitoring
+    ns: monitor
+  when: true
+  block:
+  - import_tasks: create_ns.yaml
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      app: Monitor
+      step_desc: "Deploy Monitoring Stack: Jaeger, Prometheus, Loki, Grafana"
+      manifest: app_monitor.yaml
+  - import_tasks: create_ingress.yaml
+    vars:
+      name: grafana
+      service_name: grafana
+      service_port: 80
+
+# === External Access ===============================================
+- name: "Apps / VPN / Create VPM"
+  vars:
+    app: VPM
+    ns: openvpn
+  when: true
+  block:
+  - import_tasks: create_ns.yaml
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      app: VPN
+      step_desc: "Deploy OpenVPN Helm chart"
+      manifest: app_external_access.yaml
+  - import_tasks: create_ingress.yaml
+    vars:
+      name: vpn
+      service_name: openvpn
+      service_port: 443
+      annotations:
+        ingress.kubernetes.io/protocol: "https"
+
+# === Istio =========================================================
+- name: "Apps / ServiceMesh / Install Istio"
+  vars:
+    app: ServiceMesh
+    ns: istio-system
+  when: true
+  block:
+  - import_tasks: create_ns.yaml
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      step_desc: "Deploy Istio ServiceMesh: Istio-Operator, Istio, Kiali"
+      manifest: app_istio.yaml
+
+# === Kubernetes Dashboard =========================================
+- name: "Apps / Kube-Dashboard / Create App"
+  vars:
+    app: Kube-Dashboard
+    ns: default
+  block:
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      step_desc: Create Kubernetes Dashboard via Kustomize
+      manifest: app_kubedash.yaml
+
+
+
+# === Longhorn =====================================================
+- name: "Apps / Longhorn / Create App"
+  vars:
+    app: longhorn
+    ns: longhorn-system
+  block:
+  - import_tasks: create_ns.yaml
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      step_desc: Deploy Longhorn ArgoApp with StorageClasses
+      manifest: app_longhorn.yaml
+  - import_tasks: create_ingress.yaml
+    vars:
+      name: longhorn
+      service_name: longhorn-frontend
+
+# === Ceph =========================================================
+- name: "Apps / Ceph / Create App"
+  vars:
+    app: Ceph
+    ns: my-rook-ceph
+  when: false
+  block:
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      step_desc: Deploy Ceph CR
+      manifest: app_ceph.yaml
+  - import_tasks: create_ingress.yaml
+    vars:
+      name: ceph
+      service_name: rook-ceph-mgr-dashboard
+      service_port: 7000

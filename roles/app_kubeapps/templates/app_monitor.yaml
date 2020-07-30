@@ -1,0 +1,200 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: monitor
+  namespace: my-argocd-operator
+spec:
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  orphanedResources:
+    warn: false
+    
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jaeger
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }}
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://github.com/ThomasBuchinger/argo-playground.git'
+    targetRevision: master
+    path: jaeger
+    directory:
+      jsonnet:
+        extVars:
+        - name: ingress_name
+          value: jaeger
+        - name: ingress_domain
+          value: "{{ clustername }}.{{ ipa_domain }}"
+        - name: ingress_ip
+          value: {{ ansible_default_ipv4.address }}
+        - name: ingress_service_name
+          value: jaeger-query
+        - name: ingress_service_port
+          value: http-query
+  project: monitor
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }} 
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: https://kubernetes-charts.storage.googleapis.com
+    targetRevision: '11.7.0'
+    chart: prometheus
+    helm:
+      parameters:
+        - name: alertmanager.enabled
+          value: "true"
+        - name: alertmanager.persistentVolume.enabled
+          value: "false"
+        - name: server.persistentVolume.enabled
+          value: "false"
+        - name: kubeStateMetrics.enabled
+          value: "true"
+        - name: nodeExporter.enabled
+          value: "true"
+        - name: pushgateway.enabled
+          value: "true"
+  project: monitor
+  syncPolicy:
+    automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }} 
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://grafana.github.io/loki/charts'
+    targetRevision: '0.30.2'
+    chart: loki
+  project: monitor
+  syncPolicy:
+    automated: {}
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: promtail
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }} 
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://grafana.github.io/loki/charts'
+    targetRevision: '0.23.3'
+    chart: promtail
+    helm:
+      parameters:
+        - name: loki.serviceName
+          value: loki.monitor.svc.cluster.local
+  project: monitor
+  syncPolicy:
+    automated: {}
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }} 
+    server: 'https://kubernetes.default.svc'
+  project: monitor
+  syncPolicy:
+    automated: {}
+  source:
+    repoURL: https://kubernetes-charts.storage.googleapis.com
+    targetRevision: '5.4.1'
+    chart: grafana
+    helm:
+      values: |
+        grafana.ini:
+          auth.anonymous:
+            enabled: true
+            org_role: Admin
+        datasources:
+          datasources.yaml:
+            apiVersion: 1
+            datasources:
+            - name: Prometheus
+              type: prometheus
+              url: http://prometheus-server.monitor.svc.cluster.local
+              access: proxy
+              isDefault: true
+            - name: Loki
+              type: loki
+              url: http://loki.monitor.svc.cluster.local:3100
+              isDefault: false
+            - name: Jaeger
+              type: jaeger
+              url: http://jaeger-query.monitor.svc.cluster.local:16686
+              isDefault: false
+        dashboardProviders:
+          dashboardproviders.yaml:
+            apiVersion: 1
+            providers:
+            - name: 'default'
+              orgId: 1
+              folder: ''
+              type: file
+              disableDeletion: false
+              editable: true
+              options:
+                path: /var/lib/grafana/dashboards/default
+        sidecar:
+          dashboards:
+            enabled: true
+            label: lab/grafana-dashboard
+          datasources:
+            enabled: true
+            label: lab/grafana-datasource
+                
+
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana-dashboards
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }} 
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: https://github.com/ThomasBuchinger/argo-playground/
+    targetRevision: master
+    path: grafana-content
+    directory:
+      recurse: true
+  project: monitor
+  syncPolicy:
+    automated: {}
+

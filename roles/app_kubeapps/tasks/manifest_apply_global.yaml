@@ -1,0 +1,9 @@
+
+#- name: Kube APP / Dashboard / Deploy Kubernetes Dashboard
+#  command: "kubectl apply -n kubernetes-dashboard -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml"
+- name: "Apps / {{ app }} / Copy Manifest: {{ manifest }}"
+  template:
+    src: "{{ manifest }}"
+    dest: "{{ work_dir }}/app_kube/"
+- name: "Apps / {{ app }} / {{ step_desc | default(['Apply ', manifest]) |join }}"
+  command: "kubectl apply -f {{ work_dir }}/app_kube/{{ manifest }}"

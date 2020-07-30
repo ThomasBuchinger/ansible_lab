@@ -1,0 +1,17 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-dashboard
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }}
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://github.com/ThomasBuchinger/argo-playground.git'
+    targetRevision: HEAD
+    path: dashboard
+    plugin:
+      name: kustomize-with-local-plugins
+  project: default
