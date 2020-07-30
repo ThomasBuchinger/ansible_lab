@@ -3,8 +3,8 @@
 - name: Kube APP / Operators / Deploy Operator Lifecyle Manager 
   command: "kubectl apply -f {{ item }}"
   loop:
-    - https://github.com/operator-framework/operator-lifecycle-manager/blob/master/deploy/upstream/quickstart/crds.yaml
-    - https://github.com/operator-framework/operator-lifecycle-manager/blob/master/deploy/upstream/quickstart/olm.yaml
+    - https://raw.githubusercontent.com/operator-framework/operator-lifecycle-manager/{{ olm_version }}/deploy/upstream/quickstart/crds.yaml
+    - https://raw.githubusercontent.com/operator-framework/operator-lifecycle-manager/{{ olm_version }}/deploy/upstream/quickstart/olm.yaml
 - name: Kube APP / Operators / Install Operators
   command: "kubectl apply -f {{ item }}"
   loop:
@@ -38,10 +38,10 @@
     - https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/cluster_role_binding.yaml
 
 
-- name: Kube APP / Operators / Manually install Istio Operator
-  command: "kubectl apply -k {{ item }}"
-  loop:
-    - https://github.com/istio/istio/operator/deploy/
+#- name: Kube APP / Operators / Manually install Istio Operator
+#  command: "kubectl apply -k {{ item }}"
+#  loop:
+#    - https://github.com/istio/istio/operator/deploy/
 
 - name: Kube APP / Operators / Wait for CRD created
   command: "kubectl -n my-argocd-operator wait --for condition=established --timeout=60s crd/{{ item }}"
