@@ -1,0 +1,7 @@
+- name: Config / Ingress / Copy Traefik Manifest
+  template:
+    src: traefik-ingress.yaml
+    dest: "{{ work_dir }}/app_kube/"
+- name: Config / Ingress / Apply
+  command: "kubectl apply -n ingress-controller -f {{ work_dir }}/app_kube/traefik-ingress.yaml"
+

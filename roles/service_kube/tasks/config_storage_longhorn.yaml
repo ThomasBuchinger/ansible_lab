@@ -1,0 +1,58 @@
+
+- name: Storage / NFS / Create static NFS PVs
+  command:
+    stdin: |
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: {{ item.name }}
+      spec:
+        capacity:
+          storage: {{ item.size }}Gi
+        accessModes:
+          - ReadWriteMany
+          - ReadWriteOnce
+          - ReadOnlyMany
+        volumeMode: Filesystem
+        persistentVolumeReclaimPolicy: Recycle
+        storageClassName: nfs-storage
+        mountOptions:
+          - vers=3
+        nfs:
+          path: "{{ nfs_path }}{{ item.name }}"
+          server: {{ nfs_server }}
+    argv: [ "kubectl", "apply", "-f", "-"]
+  loop: "{{ nfs_storage }}"
+
+
+- name: Storage / NFS / Create StorageClass
+  command:
+    stdin: |
+      kind: StorageClass
+      apiVersion: storage.k8s.io/v1
+      metadata:
+        name: nfs-storage
+        annotations:
+          storageclass.kubernetes.io/is-default-class: 'true'
+      provisioner: kubernetes.io/local
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+    argv: [ "kubectl", "apply", "-f", "-"]
+
+
+- name: Storage / Longhorn / Install iSCSI
+  yum:
+    name: iscsi-initiator-utils
+    state: present
+
+#- name: Storage / Longhorn / Install Longhorn
+#  command: 'kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/master/deploy/longhorn.yaml'
+
+#- name: Storage / Longhorn / Copy Longhorn StorageClass
+#  template:
+#    src: storage_longhorn.yaml
+#    dest: "{{ work_dir }}/app_kube/"
+#- name: Storage / Longhorn / Create StorageClass 
+#  command: "kubectl apply -f {{ work_dir }}/app_kube/storage_longhorn.yaml"
+
+

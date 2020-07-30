@@ -1,0 +1,26 @@
+---
+- hosts: kube-nodes
+  roles:
+    - common
+    - config_ipa_client
+
+- hosts: kube-seed
+  tasks:
+  - include_role:
+      name: service_kube
+      tasks_from: bootstrap.yaml
+- hosts: kube-masters
+  tasks:
+  - include_role:
+      name: service_kube
+      tasks_from: masters.yaml
+- hosts: kube-nodes
+  tasks:
+  - include_role:
+      name: service_kube
+      tasks_from: workers.yaml
+- hosts: kube-seed
+  tasks:
+  - include_role:
+      name: service_kube
+      tasks_from: config.yaml

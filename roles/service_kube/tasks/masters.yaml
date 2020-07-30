@@ -1,0 +1,18 @@
+- import_tasks: prepare_node.yaml
+- import_tasks: prepare_master.yaml
+
+- name: Kubernetes / Join additional Masters
+  command:
+      argv: 
+        - kubeadm
+        - join
+        - "{{ groups['kube-seed'][0] }}.{{ ipa_domain }}:6443"
+        # - --cri-sock /var/run/crio/crio.sock
+        - --discovery-token-unsafe-skip-ca-verification
+        - --token
+        - abcdef.0123456789abcdef
+        - --control-plane
+        - --certificate-key
+        - f8902e114ef118304e561c3ecd4d0b543adc226b7a07f675f56564185ffe0c07
+  when: kube_proxy.stdout != "1"
+

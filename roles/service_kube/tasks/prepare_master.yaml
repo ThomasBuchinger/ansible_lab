@@ -1,0 +1,13 @@
+- name: Master / Firewall
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items:
+    - "6443"
+    - "2379-2380"
+    - "10250"
+    - "10251"
+    - "10252"
+    - "10255"

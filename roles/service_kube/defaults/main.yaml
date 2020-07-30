@@ -1,0 +1,15 @@
+
+clustername: kube
+okd_version: 4.2
+okd_nodeport: 30036
+traefik_version: v2.2
+
+nfs_server: "10.0.0.9"
+nfs_path: /scratch/kube-
+nfs_storage:
+  - { "name": "pv1g-01", "size": 1}
+  - { "name": "pv1g-02", "size": 1}
+  - { "name": "pv1g-03", "size": 1}
+  - { "name": "pv10g-01", "size": 10}
+  - { "name": "pv10g-02", "size": 10}
+

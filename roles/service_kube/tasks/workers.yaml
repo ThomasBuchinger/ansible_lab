@@ -1,0 +1,14 @@
+- import_tasks: prepare_node.yaml
+
+
+- name: Kubernetes / Join Cluster Nodes
+  command:
+      argv: 
+        - kubeadm
+        - join
+        - "{{ groups['kube-seed'][0] }}.{{ ipa_domain }}:6443"
+        # - --cri-sock /var/run/crio/crio.sock
+        - --discovery-token-unsafe-skip-ca-verification
+        - --token
+        - abcdef.0123456789abcdef
+  when: kube_proxy.stdout != "1"

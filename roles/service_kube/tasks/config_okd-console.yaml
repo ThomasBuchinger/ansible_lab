@@ -1,0 +1,12 @@
+
+- name: Config / OKD Console / Create Namespace
+  command:
+    stdin: '{"apiVersion":"v1", "kind": "Namespace", "metadata":{ "name": "okd-console" }}'
+    argv: [ "kubectl", "apply", "-f", "-"]
+- name: Config / OKD Console / Copy Manifests
+  template:
+    src: okd-console.yaml
+    dest: "{{ work_dir }}/app_kube/"
+- name: Config / OKD Console / Apply
+  command: "kubectl apply -n okd-console -f {{ work_dir }}/app_kube/okd-console.yaml"
+

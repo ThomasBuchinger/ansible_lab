@@ -1,0 +1,38 @@
+- import_tasks: prepare_node.yaml
+- import_tasks: prepare_master.yaml
+
+- name: Kubernetes / Bootstrap first Master
+  command:
+      argv: 
+        - kubeadm
+        - init
+        # - --cri-sock /var/run/crio/crio.sock
+        - --token 
+        - abcdef.0123456789abcdef
+        - --control-plane-endpoint
+        - "{{ clustername }}.{{ ipa_domain }}:6443"
+        - --upload-certs
+        - --certificate-key
+        - f8902e114ef118304e561c3ecd4d0b543adc226b7a07f675f56564185ffe0c07
+  when: kube_proxy.stdout != "1"
+# - name: Kubernetes / CNI / Weave
+#   shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+- name: Kubernetes / KUBECONFIG / Create .kube directory
+  file:
+    path: /root/.kube/
+    state: directory
+
+- name: Kubernetes / KUBECONFIG / Copy KUBECONFIG to root
+  copy:
+    src: /etc/kubernetes/admin.conf
+    remote_src: yes
+    dest: /root/.kube/config
+
+- name: Kubernetes / CNI / Get Kubelet Version
+  shell: "kubectl version --short --client=true | sed 's/Client Version: v//'"
+  register: kube_version
+
+- name: Kubernetes / CNI / Install Weave CNI Plugin
+  command: "kubectl apply -f https://cloud.weave.works/k8s/net?k8s-version={{ kube_version.stdout }}"
+

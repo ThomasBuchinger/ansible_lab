@@ -1,0 +1,148 @@
+- name: Node / Firewall
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items:
+    - "80"
+    - "443"
+    - "6783"
+    - "9090"
+    - "10250"
+    - "10251"
+    - "10252"
+    - "10255"
+    - "30000-32767"
+
+
+# Disable Cockpit on worker nodes, because Ceph uses Port 9090
+- file:
+    path: /etc/systemd/system/cockpit.socket.d
+    state: directory
+- name: Cockpit-Worker / Change Cockpit Port because we need that for Ceph
+  copy:
+    content: |
+      [Socket]
+      ListenStream=
+      ListenStream=9099
+    dest: /etc/systemd/system/cockpit.socket.d/listen.conf
+- name: Cockpit-Worker / Install semanage command
+  yum:
+    name: policycoreutils-python
+    state: present
+- name: Cockpit-Worker / Allow new port in SELinux
+  command: semanage port -a -t websm_port_t -p tcp 9099
+  register: se_cmd
+  failed_when: not (se_cmd.rc == 0 or se_cmd.rc == 1)
+- name: Cockpit-Worker / Restart Cockpit
+  systemd:
+    name: cockpit.socket
+    state: restarted
+    daemon-reload: yes
+
+- name: Node / Install git for kubectl
+  yum:
+    name: git
+    state: present
+
+- name: Node / Network / br_netfilter kernel module
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Node / Configure iptables to receive bridge network traffic
+  sysctl: 
+    name: "{{ item }}"
+    value: '1'
+    state: present
+  with_items:
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-arptables
+    - net.ipv4.ip_forward
+
+
+# This task disables swap for Kubernetes node (see https://github.com/kubernetes/kubernetes/pull/31996)
+- name: Node / Swap / Remove swapfile from /etc/fstab
+  mount:
+    name: swap
+    fstype: swap
+    state: absent
+- name: Node / Swap / Disable active swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: Node / CRI / Conigure Docker repo
+  yum_repository:
+      name: docker-ce
+      baseurl: "https://download.docker.com/linux/centos/7/$basearch/stable" # There is no EL8 repo
+      description: Docker Repo
+      repo_gpgcheck: yes
+      gpgcheck: yes
+      gpgkey: https://download.docker.com/linux/centos/gpg
+      enabled: yes 
+      state: present
+  
+- name: Node / CRI / Install Docker
+  yum:
+    name:
+     - containerd.io
+     - docker-ce
+    state: present
+
+- name: Node / CRI / Start Docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+# - name: Node / CRI / Install CRI-O Container runtime and Tools
+#   yum:
+#     name: 
+#      - crio
+#      - podman
+#      - buildah
+#      - skopeo
+#     state: present
+
+# - name: Node / CRI / Start CRI-O
+#   systemd:
+#     name: cri-o
+#     enabled: yes
+#     state: started
+
+- name: Node / Kubernetes / Look for kube-proxy
+  shell: "docker ps  | grep k8s_kube-proxy_kube-proxy | wc -l"
+  register: kube_proxy
+
+
+- name: Node / Kubernetes / Create Repo
+  yum_repository:
+      name: Kubernetes
+      baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+      description: Upstream Kube Repo
+      repo_gpgcheck: no
+      gpgcheck: no 
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg
+      enabled: yes 
+      state: present
+
+- name: Node / Kubernetes / Install Kubernetes
+  yum:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+
+# - name: Node / Kubernetes / Configure Kubelet for CRIO
+#   lineinfile:
+#     line: KUBELET_EXTRA_ARGS=--feature-gates="AllAlpha=false,RunAsGroup=true" --container-runtime=remote --cgroup-driver=systemd --container-runtime-endpoint='unix:///var/run/crio/crio.sock' --runtime-request-timeout=5m
+#     regexp: KUBELET_EXTRA_ARGS
+#     dest: /etc/sysconfig/kubelet/default
+ 
+- name: Node / Kubernetes / Start the Kubelet
+  systemd:
+      name: kubelet
+      enabled: yes
+      state: started
