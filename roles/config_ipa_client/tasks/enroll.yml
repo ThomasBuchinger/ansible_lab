@@ -1,6 +1,6 @@
 ---
 
-- name: "[Setup] Enable IDM Apstream"
+- name: "[Setup] Enable IDM Appstream"
   dnf:
     name: "@idm:DL1/client" 
     state: present
@@ -25,7 +25,7 @@
   hostname:
     name: "{{ ansible_hostname }}.{{ ipa_domain }}"
 
-- name: "[Prepare] Verify DNS Settungs"
+- name: "[Prepare] Verify DNS Settings"
   command: "nslookup ipa.{{ ipa_domain }}"
   failed_when: result.rc == 1
   changed_when: result.rc != 0
