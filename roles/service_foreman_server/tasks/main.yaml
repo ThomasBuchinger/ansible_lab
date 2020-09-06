@@ -1,0 +1,18 @@
+---
+- import_tasks: prepare_host.yaml
+
+- import_tasks: configure_foreman_server.yaml
+- import_tasks: configure_foreman_proxy-plugins.yaml
+
+#- import_tasks: configure_compute_vmware.yaml
+#  when: 
+#   - vctr_host is defined
+#   - "not skip_compute_vmware == 'yes'"
+- import_tasks: configure_compute_kvm.yaml
+  when: 
+    - kvm_host is defined
+    - not skip_compute_kvm == "yes"
+- import_tasks: configure_resources.yaml
+
+- import_tasks: configure_ansible.yaml
+- import_tasks: fix_tftpboot.yaml

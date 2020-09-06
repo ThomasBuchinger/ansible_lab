@@ -1,0 +1,12 @@
+---
+- name: Fix-2 / Foreman / Copy missing file to tftpboot
+  copy:
+    dest: /var/lib/tftpboot
+    src: "/usr/share/syslinux/{{ item }}"
+    remote_src: yes
+    owner: foreman-proxy
+    group: root
+  loop:
+    - ldlinux.c32
+    - libutil.c32
+    - libcom32.c32

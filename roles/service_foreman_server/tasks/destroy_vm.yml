@@ -1,9 +1,0 @@
----
-- name: "[Foreman] Delete {{ vm_name }} on Foreman..."
-  command: "hammer host delete --name {{ vm_name }}.{{ ipa_domain }}" 
-  args:
-    chdir: "{{ work_dir }}/service_foreman_server"
-  register: cmd
-  failed_when: cmd.rc != 70 and cmd.rc != 0
-  changed_when: cmd.rc != 70
-

@@ -1,6 +1,17 @@
 ---
-#    --foreman-plugin-ovirt-provision-package="tfm-rubygem-ovirt_provision_plugin"
-#    --foreman-plugin-tasks-package="tfm-rubygem-foreman-tasks"
+- name: Fix-1 / Foreman / Foreman directory not writeable
+  file:
+    path: /usr/share/foreman
+    state: directory
+    recurse: yes
+    owner: foreman
+    group: foreman
+  ignore_errors: yes
+- name: Fix-1 / Foreman / Foreman directory not writeable
+  file:
+    path: /tmp/bundler
+    state: absent
+
 - name: "[Setup] Run Foreman-Installer"
   command: >
     foreman-installer --detailed-exitcodes  --no-colors
@@ -19,7 +30,6 @@
       --enable-foreman-plugin-templates
       --enable-foreman-compute-openstack
       --enable-foreman-compute-ovirt
-      --enable-foreman-compute-rackspace
       --enable-foreman-compute-vmware
       --enable-foreman-compute-libvirt
 
@@ -32,21 +42,16 @@
     --foreman-compute-libvirt-version='installed'
     --foreman-compute-openstack-version='installed'
     --foreman-compute-ovirt-version='installed'
-    --foreman-compute-rackspace-version='installed'
     --foreman-compute-vmware-version='installed'
 
-
-
-    --foreman-proxy-dir="/usr/share/foreman-proxy"
     --foreman-proxy-foreman-base-url=https://{{ ansible_fqdn }}
     --foreman-proxy-use-sudoers=true 
-    --foreman-proxy-use-sudoersd=true
-    --foreman-proxy-user="foreman-proxy" 
+    --foreman-proxy-use-sudoersd=true 
     --foreman-proxy-manage-puppet-group=true
     --foreman-proxy-manage-sudoersd=true
-    
-    --foreman-proxy-freeipa-config="/etc/ipa/default.conf"
-    --foreman-proxy-freeipa-remove-dns=true
+    --foreman-proxy-register-in-foreman=true
+    --foreman-proxy-registered-name={{ ansible_fqdn }}
+
      
     --foreman-proxy-puppet=true
     --foreman-proxy-puppet-ssl-ca="/etc/puppetlabs/puppet/ssl/certs/ca.pem"

@@ -1,6 +1,6 @@
 ---
 - name: "[SSH-Key] Manage SSH key for Foreman"
-  hosts: satellite
+  hosts: foreman
   # Foreman uses ssh authentication to communicate with KVM
   # This play manages the .ssh directory for foreman and foreman-proxy:
   # install the ansible ssh key, scan network for kvm hosts and add their keys to known_hosts

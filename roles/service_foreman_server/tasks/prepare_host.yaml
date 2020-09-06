@@ -13,8 +13,8 @@
 - name: "Prepare Host / Install EPEL 7 Repo for SCL & python"
   dnf:
     name:
-#    - "@python36:3.6/common"
-#    - "@ruby:2.5/common"
+    - "@python38:3.8/common"
+    - "@ruby:2.5/common"
     - epel-release
     - http://yum.puppet.com/puppet6-release-el-8.noarch.rpm
     - "https://yum.theforeman.org/releases/{{ foreman_version }}/el8/x86_64/foreman-release.rpm"

@@ -1,4 +1,4 @@
-#!/bin/python
+#!/bin/python3
 import os
 import argparse
 import sys
@@ -22,7 +22,7 @@ def get_id_of(type_name, name):
     info, status=call_process("hammer os info --title {}", name )
   else:
     info, status=call_process("hammer {} info --name {}", type_name, name )
-  return re.compile("Id:\\s*(\\d+)", re.MULTILINE).search(info.strip()).group(1)
+  return re.compile("Id:\\s*(\\d+)", re.MULTILINE).search(str(info.strip())).group(1)
 
 # Imitate the Hammer CLI
 # Configure argparse to simulate the hammer CLI while parsing the resource type and verb
@@ -67,7 +67,7 @@ if res_status == 70:
   # exit code 70 --> resource not found
   # run the hammer command and print the sub-process STDOUT to our STDOUT
   create_stdout, exit_code = call_process( "hammer {} {} '{}'", args.type, args.verb, "' '".join(args.hammer_args)  )
-  print create_stdout
+  print(create_stdout)
   if exit_code == 0:
     # success, exit with 1 to indicate we have changed something
     sys.exit(1)

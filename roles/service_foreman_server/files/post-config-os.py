@@ -1,4 +1,4 @@
-#!/bin/python
+#!/bin/python3
 import os
 import argparse
 import sys
@@ -21,7 +21,7 @@ def get_id_of(type_name, name):
     info, status=call_process("hammer os info --title '{}'", name )
   else:
     info, status=call_process("hammer {} info --name '{}'", type_name, name )
-  return re.compile("Id:\\s*(\\d+)", re.MULTILINE).search(info.strip()).group(1)
+  return re.compile("Id:\\s*(\\d+)", re.MULTILINE).search(str(info.strip())).group(1)
 
 # Link a partition table to a OS
 #
@@ -74,7 +74,7 @@ try:
   pxe_id=get_id_of('template', args.pxe[0])
 
 except AttributeError:
-  print "Cannot find object"
+  print("Cannot find object")
   sys.exit(2) 
   
 for ptable in ptable_ids:

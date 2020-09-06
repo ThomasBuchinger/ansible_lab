@@ -1,6 +1,6 @@
 ---
 - name: "[Configure] Create KVM Link"
-  command: "python ./hammer.py compute-resource create --name {{ kvm_name }} --provider libvirt --url qemu+ssh://{{ kvm_host }}/system --display-type VNC --set-console-password no"
+  command: "python3 ./hammer.py compute-resource create --name {{ kvm_name }} --provider libvirt --url qemu+ssh://{{ kvm_host }}/system --display-type VNC --set-console-password no"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   register: cmd
