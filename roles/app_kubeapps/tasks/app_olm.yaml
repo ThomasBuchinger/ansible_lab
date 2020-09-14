@@ -10,11 +10,11 @@
   loop:
     - https://operatorhub.io/install/argocd-operator.yaml
     - https://operatorhub.io/install/elastic-cloud-eck.yaml
-    - https://operatorhub.io/install/project-quay.yaml # Does no work,, due to wrong CRD
+    - https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+#    - https://operatorhub.io/install/project-quay.yaml # Does no work,, due to wrong CRD
     - https://operatorhub.io/install/kiali.yaml # Banzai Cloud Operator: Istio uses the native operator
-    - https://operatorhub.io/install/jenkins-operator.yaml
-#    - https://raw.githubusercontent.com/rook/rook/release-1.0/cluster/examples/kubernetes/ceph/common.yaml # Rolebindings for Rook
-#    - https://operatorhub.io/install/rook-ceph.yaml
+    - https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/common.yaml # Rolebindings for Rook
+    - https://operatorhub.io/install/rook-ceph.yaml
 #    - https://operatorhub.io/install/strimzi-kafka-operator.yaml
 #    - https://operatorhub.io/install/postgres-operator.yaml
     # The Crunchy Data Operator does not support multiple namespaces

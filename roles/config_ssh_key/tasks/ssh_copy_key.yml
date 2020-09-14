@@ -6,21 +6,21 @@
 - import_tasks: create_ssh_user.yml
   when: ssh_user_name is defined
 
-- name: "[Install] Create Directory"
+- name: "Copy SSH key / Create Directory"
   file:
     name: "{{ key_path }}/"
     state: directory
-- name: "[Install] Install public key for ansible use"
+- name: "Copy SSH key / Copy public key"
   copy:
-    src: id_rsa.pub
+    content: "{{ key_public }}"
     dest: "{{ key_path}}/{{ private_key_name }}.pub"
     mode: "{{ key_permission|default(omit) }}"
     owner: "{{ key_owner|default(omit) }}"
     group: "{{ key_group|default(omit) }}"
 
-- name: "[Install] Install private key for ansible use"
+- name: "Copy SSH key / Copy private key"
   copy:
-    src: id_rsa
+    content: "{{ key_private }}"
     dest: "{{ key_path }}/{{ private_key_name }}"
     mode: "{{ key_permission|default(omit) }}"
     owner: "{{ key_owner|default(omit) }}"

@@ -18,7 +18,7 @@
 - name: "[[RedHat] Enable additional Repos"
   rhsm_repository:
     name: 
-      - rehl-8-for-x86_64-supplementary-rpms
+      - rhel-8-for-x86_64-supplementary-rpms
     state: present
   when: ansible_distribution_major_version == '8'
 

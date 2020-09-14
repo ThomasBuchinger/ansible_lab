@@ -1,0 +1,64 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: istio
+  namespace: my-argocd-operator
+spec:
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  orphanedResources:
+    warn: false
+    
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: istio-system
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://github.com/ThomasBuchinger/argo-playground.git'
+    targetRevision: figureout-istio
+    path: istio
+  project: istio
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kiali
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }}
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: 'https://github.com/ThomasBuchinger/argo-playground.git'
+    targetRevision: figureout-istio
+    path: kiali
+    directory:
+      jsonnet:
+        extVars:
+        - name: ingress_name
+          value: kialidash
+        - name: ingress_domain
+          value: "{{ clustername }}.{{ ipa_domain }}"
+        - name: ingress_ip
+          value: {{ ansible_default_ipv4.address }}
+        - name: ingress_service_name
+          value: kiali
+        - name: ingress_service_port
+          value: "http"
+  project: istio
+

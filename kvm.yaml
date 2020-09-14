@@ -16,7 +16,6 @@
       ssh_remote_host: "{{ ssh_host }}"
       ssh_user_name: root
     with_items:
-      - "{{ groups['satellite'] }}"
-      - "{{ groups['ipa'] }}"
+      - "{{ groups['foremanservers'] }}"
     loop_control:
       loop_var: ssh_host

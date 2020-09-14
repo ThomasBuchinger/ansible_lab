@@ -33,11 +33,30 @@
 # === Rev Proxy ====================================================
 - name: "Apps / Reverse Proxy / Create App"
   vars:
-    app: revproxy
+    app: External-Access
     ns: traefik
   when: true
   block:
   - import_tasks: create_ns.yaml
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      step_desc: "Deploy Traefik Configuration for External Access"
+      manifest: app_external_access.yaml
+
+
+# === Certificate Operator =========================================
+- name: "Apps / Cert Operator / Create App"
+  vars:
+    app: Cert Operator
+    ns: cert-operator
+  when: true
+  block:
+  - import_tasks: create_ns.yaml
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      app: Cert
+      step_desc: "Deploy Certificate Operator"
+      manifest: app_certs.yaml
 
 # === Monitoring ====================================================
 - name: "Apps / Monitoring / Create App"
@@ -58,26 +77,18 @@
       service_name: grafana
       service_port: 80
 
-# === External Access ===============================================
-- name: "Apps / VPN / Create VPM"
+# === Docker Registry ===============================================
+- name: "Apps / Registry / Deploy Docker-Registry"
   vars:
-    app: VPM
-    ns: openvpn
+    app: Registry
+    ns: docker-registry
   when: true
   block:
   - import_tasks: create_ns.yaml
   - import_tasks: manifest_apply_global.yaml
     vars:
-      app: VPN
-      step_desc: "Deploy OpenVPN Helm chart"
-      manifest: app_external_access.yaml
-  - import_tasks: create_ingress.yaml
-    vars:
-      name: vpn
-      service_name: openvpn
-      service_port: 443
-      annotations:
-        ingress.kubernetes.io/protocol: "https"
+      step_desc: "Deploy Docker-Registry Helm chart"
+      manifest: app_build.yaml
 
 # === Istio =========================================================
 - name: "Apps / ServiceMesh / Install Istio"
@@ -126,7 +137,7 @@
   vars:
     app: Ceph
     ns: my-rook-ceph
-  when: false
+  when: true
   block:
   - import_tasks: manifest_apply_global.yaml
     vars:

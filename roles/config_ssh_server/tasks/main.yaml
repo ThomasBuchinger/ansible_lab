@@ -1,0 +1,65 @@
+
+- name: Create a User
+  when: username is defined and groupname is defined 
+  block:
+    - name: "User / Create Group: admins"
+      group:
+        name: "{{ groupname }}"
+        state: present
+    - name: "User / Create User: access"
+      user:
+        name: "{{ username }}"
+        groups: 
+          - "{{ groupname }}"
+        password: '*'
+        comment: "Remote access user"
+        create_home: yes
+        shell: /bin/bash
+        state: present
+    - name: User / Add admins to sudoers
+      lineinfile:
+        line: "%{{ groupname }}        ALL=(ALL)       NOPASSWD: ALL"
+        dest: /etc/sudoers
+    - name: User / Add ssh key
+      authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ ssh_key }}"
+      when: ssh_key is defined
+
+
+- name: Config / Set global options
+  lineinfile:
+    line: "{{ item.line }}"
+    regexp: "{{ item.regex | default(omit) }}"
+    state: present
+    path: /etc/ssh/sshd_config
+    backup: yes
+    firstmatch: yes
+  notify: restart_ssh
+  loop:
+    - { line: "AddressFamily inet", regex: "AddressFamily" }
+    - { line: "Protocol 2", regex: "Protocol" }
+    - { line: "X11Forwarding no", regex: "^X11Forwarding" }
+    - { line: "PermitUserEnvironment no", regex: "PermitUserEnvironment" }
+    - { line: "AllowAgentForwarding no", regex: "AllowAgentForwarding" }
+    - { line: "AllowTcpForwarding no", regex: "AllowTcpForwarding" }
+    - { line: "PermitTunnel no", regex: "PermitTunnel" }
+
+    - { line: "AllowGroups root admins", regex: "AllowGroups" }
+
+    - { line: "PermitRootLogin yes", regex: "^PermitRootLogin" }
+    - { line: "PasswordAuthentication no", regex: "^PasswordAuthentication" }
+    - { line: "PermitEmptyPasswords no", regex: "^#?PermitEmptyPasswords" }
+    - { line: "ChallengeResponseAuthentication no", regex: "^ChallengeResponseAuthentication" }
+    - { line: "KerberosAuthentication no", regex: "KerberosAuthentication" }
+    - { line: "GSSAPIAuthentication no", regex: "^GSSAPIAuthentication" }
+  
+- name: Config / Configure external access
+  blockinfile:
+    content: "{{ item.content }}"
+    path: /etc/ssh/sshd_config
+  notify: restart_ssh
+  when: nat_server is defined
+  loop:
+  - { content: "Match Host {{ nat_server }}\n  PermitRootLogin no" }

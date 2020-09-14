@@ -1,0 +1,73 @@
+# ===== Ceph ============================================================
+---
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: ceph-cluster
+  namespace: my-rook-ceph
+spec:
+  cephVersion:
+    image: 'ceph/ceph:v14.2.4-20190917'
+  dataDirHostPath: /var/lib/rook
+  mon:
+    count: 3
+  dashboard:
+    enabled: true
+  network:
+    hostNetwork: false
+  rbdMirroring:
+    workers: 0
+  placement:
+    all:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+  storage:
+    useAllNodes: true
+    useAllDevices: true
+
+---
+apiVersion: ceph.rook.io/v1
+kind: CephNFS
+metadata:
+  name: ceph-nfs
+  namespace: my-rook-ceph
+spec: {}
+
+---
+apiVersion: ceph.rook.io/v1
+kind: CephFilesystem
+metadata:
+  name: ceph-fs
+  namespace: my-rook-ceph
+spec: {}
+
+---
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: replicapool
+  namespace: my-rook-ceph
+spec:
+  failureDomain: host
+  replicated:
+    size: 1
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-ceph-block
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: ceph.rook.io/block
+parameters:
+  blockPool: replicapool
+  # The value of "clusterNamespace" MUST be the same as the one in which your rook cluster exist
+  clusterNamespace: my-rook-ceph
+  # Specify the filesystem type of the volume. If not specified, it will use `ext4`.
+  fstype: xfs
+# Optional, default reclaimPolicy is "Delete". Other options are: "Retain", "Recycle" as documented in https://kubernetes.io/docs/concepts/storage/storage-classes/
+reclaimPolicy: Delete
+
+

@@ -1,6 +1,0 @@
----
-- name: "[Bootstrap] Setup KVM host"
-  vars:
-    skip_ipa_integration: "yes"
-  import_playbook: ../kvm.yml
-  

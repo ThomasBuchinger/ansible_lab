@@ -1,0 +1,20 @@
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: certificate-operator
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }}
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: https://charts.jetstack.io
+    targetRevision: '1.0.1'
+    chart: cert-manager 
+    helm:
+      parameters:
+        - name: installCRDs
+          value: "true"
+  project: default

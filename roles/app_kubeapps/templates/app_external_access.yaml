@@ -1,0 +1,28 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-access
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }} 
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: https://github.com/ThomasBuchinger/argo-playground
+    targetRevision: 'rev-proxy'
+    path: "reverse-proxy" 
+    directory:
+      jsonnet:
+        extVars:
+        - name: ingress_name
+          value: static
+        - name: ingress_domain
+          value: "{{ clustername }}.{{ ipa_domain }}"
+        - name: ingress_ip
+          value: {{ ansible_default_ipv4.address }}
+        - name: ingress_service_name
+          value: static
+        - name: ingress_service_port
+          value: http
+  project: default

@@ -1,0 +1,18 @@
+---
+- name: "Node / Create /etc/hosts entries"
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[node]['ansible_host'] }} {{ node }}.{{ ipa_domain }}"
+    state: present
+  with_items:
+    - "{{ groups['kube-nodes'] }}"
+  loop_control:
+    loop_var: node
+
+- name: "Node / Create entry for {{ clustername }}.{{ ipa_domain }} in /etc/hosts"
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[seed_node]['ansible_host'] }} {{ clustername }}.{{ ipa_domain }}"
+    state: present
+  vars:
+    seed_node:  "{{ groups['kube-seed'][0] }}"

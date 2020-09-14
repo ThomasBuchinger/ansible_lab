@@ -1,3 +1,6 @@
+- name: Node / Configure name resolution
+  import_tasks: prepare_nameresolution.yaml
+
 - name: Node / Firewall
   firewalld:
     port: "{{ item }}/tcp"
@@ -31,6 +34,7 @@
   yum:
     name: policycoreutils-python
     state: present
+  when: ansible_distribution_major_version == '7'
 - name: Cockpit-Worker / Allow new port in SELinux
   command: semanage port -a -t websm_port_t -p tcp 9099
   register: se_cmd

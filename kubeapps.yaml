@@ -1,4 +1,4 @@
 ---
-- hosts: kube-seed
+- hosts: kube_seed
   roles:
     - app_kubeapps

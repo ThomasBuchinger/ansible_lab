@@ -1,25 +1,28 @@
 ---
-- hosts: kube-nodes
+- hosts: kube_nodes
   roles:
     - common
-    - config_ipa_client
 
-- hosts: kube-seed
+- hosts: kube_seed
   tasks:
+  - include_role:
+      name: service_dnsmasq
+    vars:
+      dnsmasq_config: "address=/kube.{{ ipa_domain }}/{{ ansible_host }}" 
   - include_role:
       name: service_kube
       tasks_from: bootstrap.yaml
-- hosts: kube-masters
+- hosts: kube_masters
   tasks:
   - include_role:
       name: service_kube
       tasks_from: masters.yaml
-- hosts: kube-nodes
+- hosts: kube_nodes
   tasks:
   - include_role:
       name: service_kube
       tasks_from: workers.yaml
-- hosts: kube-seed
+- hosts: kube_seed
   tasks:
   - include_role:
       name: service_kube

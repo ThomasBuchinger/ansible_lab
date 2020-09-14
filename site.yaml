@@ -1,0 +1,14 @@
+---
+#- name: "[VMs] Configure hosts in VM group"
+#  hosts: vms
+#  roles:
+#    - common
+#    - config_ipa_client
+
+- import_playbook: kvm.yaml
+- import_playbook: foreman.yaml
+- import_playbook: kubecluster.yaml
+- import_playbook: kubeapps.yaml
+
+
+#- include: rasp-m3.yml
