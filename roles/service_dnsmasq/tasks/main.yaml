@@ -18,15 +18,14 @@
     state: enabled
 
 - name: dnsmasq / Copy configuration
-  copy:
-    content: "{{ dnsmasq_config }}"
+  template:
+    src: dnsmasq.conf.j2
     dest: "/etc/dnsmasq.d/config_by_ansible.conf"
-  when: dnsmasq_config is defined
   notify: restart_dnsmasq
 
 - name: dnsmasq / Edit /etc/hosts
   lineinfile:
-    content: "{{ item }}"
+    line: "{{ item }}"
     dest: "/etc/hosts"
   loop: "{{ dnsmasq_etc_hosts }}"
   when: dnsmasq_etc_hosts is defined

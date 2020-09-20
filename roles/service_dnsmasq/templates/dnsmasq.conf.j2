@@ -1,0 +1,7 @@
+bind-interfaces
+interface={{ ansible_default_ipv4.interface }}
+
+
+{% for entry in static_dns %}
+address=/{{ entry.name }}.{{ ipa_domain }}/{{ entry.ip }}
+{% endfor %}
