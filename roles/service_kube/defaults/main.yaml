@@ -1,6 +1,6 @@
 
 clustername: kube
-okd_version: 4.2
+okd_version: 4.5
 okd_nodeport: 30036
 traefik_version: v2.2
 

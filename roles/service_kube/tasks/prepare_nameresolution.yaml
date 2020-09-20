@@ -5,7 +5,7 @@
     line: "{{ hostvars[node]['ansible_host'] }} {{ node }}.{{ ipa_domain }}"
     state: present
   with_items:
-    - "{{ groups['kube-nodes'] }}"
+    - "{{ groups['kube_nodes'] }}"
   loop_control:
     loop_var: node
 
@@ -15,4 +15,4 @@
     line: "{{ hostvars[seed_node]['ansible_host'] }} {{ clustername }}.{{ ipa_domain }}"
     state: present
   vars:
-    seed_node:  "{{ groups['kube-seed'][0] }}"
+    seed_node:  "{{ groups['kube_seed'][0] }}"

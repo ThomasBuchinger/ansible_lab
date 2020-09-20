@@ -122,15 +122,8 @@
 
 
 - name: Node / Kubernetes / Create Repo
-  yum_repository:
-      name: Kubernetes
-      baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
-      description: Upstream Kube Repo
-      repo_gpgcheck: no
-      gpgcheck: no 
-      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg
-      enabled: yes 
-      state: present
+  import_tasks: create_repo.yaml
+
 
 - name: Node / Kubernetes / Install Kubernetes
   yum:

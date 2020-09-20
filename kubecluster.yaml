@@ -5,10 +5,10 @@
 
 - hosts: kube_seed
   tasks:
-  - include_role:
-      name: service_dnsmasq
-    vars:
-      dnsmasq_config: "address=/kube.{{ ipa_domain }}/{{ ansible_host }}" 
+  #- include_role:
+  #    name: service_dnsmasq
+  #  vars:
+  #    dnsmasq_config: "address=/kube.{{ ipa_domain }}/{{ ansible_host }}" 
   - include_role:
       name: service_kube
       tasks_from: bootstrap.yaml

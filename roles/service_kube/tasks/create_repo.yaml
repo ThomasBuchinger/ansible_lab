@@ -1,0 +1,10 @@
+# Needed as extra tasks to install kubectl on other nodes
+- yum_repository:
+    name: Kubernetes
+    baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+    description: Upstream Kube Repo
+    repo_gpgcheck: no
+    gpgcheck: no 
+    gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg
+    enabled: yes 
+    state: present
