@@ -1,0 +1,28 @@
+- hosts: foremanservers
+  tasks:
+  - name: "[Foreman] Create {{ vm_name }} on Foreman..."
+    command: >
+      python3 ./hammer.py host create 
+        --build=true 
+        --name "{{ item.name }}" 
+        --ip "{{ item.ip }}"
+        --compute-profile kube 
+        --compute-resource buc-kvm 
+        --hostgroup NG7a-LAB 
+        --location 'Default Location' 
+        --organization 'Default Organization'
+        --operatingsystem Centos7
+        --medium 'CentOS 7 mirror'
+        --partition-table BUC-partition-var 
+    args:
+      chdir: "{{ work_dir }}/service_foreman_server"
+    register: cmd
+    failed_when: cmd.rc >= 2
+    changed_when: cmd.rc == 1
+    loop:
+      - { name: k8s-node1.buc.local, ip: 10.0.0.21 }
+      - { name: k8s-node2.buc.local, ip: 10.0.0.22 }
+      - { name: k8s-node3.buc.local, ip: 10.0.0.23 }
+      - { name: k8s-node4.buc.local, ip: 10.0.0.24 }
+      - { name: k8s-node5.buc.local, ip: 10.0.0.25 }
+      - { name: k8s-node6.buc.local, ip: 10.0.0.26 }
