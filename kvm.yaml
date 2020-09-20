@@ -3,19 +3,6 @@
   roles:
     - config_redhat
     - common
-#    - config_ipa_client
     - { role: config_vdo, vdo_name: "{{ kvm_vdo_name }}", dev_name: "{{ kvm_vdo_dev }}", mountpoint: '/var/lib/libvirt/images', vdo_scale: 10, vdo_lv_size: "{{ kvm_vdo_size }}" }
+    - service_dnsmasq
     - service_kvm_hypervisor
-  tasks:
-  - name: "[SSH] Scan infrastructure hosts"
-    include_role:
-      name: config_ssh_key
-      tasks_from: ssh_keyscan.yml
-    vars:
-      ssh_known_hosts_path: /root/.ssh/known_hosts
-      ssh_remote_host: "{{ ssh_host }}"
-      ssh_user_name: root
-    with_items:
-      - "{{ groups['foremanservers'] }}"
-    loop_control:
-      loop_var: ssh_host
