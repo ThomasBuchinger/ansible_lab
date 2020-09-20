@@ -40,10 +40,12 @@
   - name: "[SSH-Key] Install the SSH key to Foreman"
     include_role:
       name: config_ssh_key
-      tasks_from: ssh_ansible_key.yml
+      tasks_from: ssh_copy_key.yml
     vars:
       key_path: "/usr/share/foreman/.ssh"
       private_key_name: id_rsa
+      key_private: "{{ ansible_private_key }}"
+      key_public: "{{ ansible_public_key }}"
       ssh_user_name: foreman
       ssh_user_create_home: no
       key_owner: foreman
@@ -64,6 +66,4 @@
 
   roles:
     - common
-#    - config_ipa_client
-#    - service_ansible
     - service_foreman_server

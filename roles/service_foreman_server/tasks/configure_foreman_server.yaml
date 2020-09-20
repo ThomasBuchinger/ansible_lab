@@ -12,6 +12,7 @@
     path: /tmp/bundler
     state: absent
 
+# Disable Foreman-Proxy during install because the registration fails during install
 - name: "[Setup] Run Foreman-Installer"
   command: >
     foreman-installer --detailed-exitcodes  --no-colors

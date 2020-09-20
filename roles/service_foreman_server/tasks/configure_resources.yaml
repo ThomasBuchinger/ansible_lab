@@ -6,13 +6,21 @@
   register: cmd
   failed_when: cmd.rc >= 2
 - name: "[Configure] Create Network {{ compute_network }}"
-  command: "python3 ./hammer.py subnet create --name {{ default_net_name }} --boot-mode=Static --dns-primary {{ ipa_ip }} --dns-secondary {{ default_net_gateway }} --domains {{ ipa_domain }} --mask '255.255.255.0' --network {{ default_net_id }} --gateway={{ default_net_gateway }} --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}"
+  command: "python3 ./hammer.py subnet create --name {{ default_net_name }} --boot-mode=Static --dns-primary {{ ipa_ip }} --dns-secondary {{ default_net_gateway }} --domains {{ ipa_domain }} --mask '255.255.255.0' --network {{ default_net_id }} --gateway={{ default_net_gateway }} --from {{ default_net_hoststart }} --to {{ default_net_hostend }} --ipam 'Internal DB' --tftp-id AUTO_PROXY_{{ ansible_fqdn }} --dns-id AUTO_PROXY_{{ ansible_fqdn }} --dhcp-id AUTO_PROXY_{{ ansible_fqdn }}" 
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   register: cmd
   failed_when: cmd.rc >= 2
   changed_when: cmd.rc == 1
 
+
+- name: "[Configure] Create Compute-profiles"
+  include_tasks: import_create_computeprofile.yaml
+  loop_control:
+    loop_var: profile
+  loop:
+    - { name: kube, cpus: 4, memory: 12, size: 100}
+    - { name: default, cpus: 1, memory: 2, size: 100}
 
 
 - name: "[Configure] Copy Configuration templates into place"
@@ -91,6 +99,8 @@
       - Centos8
       - --medium
       - "CentOS 8 mirror"
+      - --compute-profile
+      - default
       - --compute-resource
       - "{{ foreman_default_compute }}"
       - --pxe-loader
