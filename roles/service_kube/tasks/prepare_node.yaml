@@ -18,6 +18,10 @@
     - "10255"
     - "30000-32767"
 
+- name: Node / Install OS dependencies (aka nfs)
+  yum:
+    name: nfs-utils
+    state: present
 
 # Disable Cockpit on worker nodes, because Ceph uses Port 9090
 - file:
@@ -77,6 +81,7 @@
   command: swapoff -a
   when: ansible_swaptotal_mb > 0
 
+
 - name: Node / CRI / Conigure Docker repo
   yum_repository:
       name: docker-ce
@@ -101,7 +106,6 @@
     enabled: yes
     state: started
 
-# - name: Node / CRI / Install CRI-O Container runtime and Tools
 #   yum:
 #     name: 
 #      - crio

@@ -12,4 +12,7 @@ nfs_storage:
   - { "name": "pv1g-03", "size": 1}
   - { "name": "pv10g-01", "size": 10}
   - { "name": "pv10g-02", "size": 10}
+  - { "name": "pv10g-03", "size": 10}
+  - { "name": "pv10g-04", "size": 10}
+  - { "name": "pv10g-05", "size": 10}
 
