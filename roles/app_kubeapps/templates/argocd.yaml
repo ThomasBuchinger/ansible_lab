@@ -1,5 +1,17 @@
 
 # ===== ArgoCD ==========================================================
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: git-cred
+  namespace: "{{ ns }}"
+type: Opaque
+data:
+  username: '{{ github_user | b64encode }}'
+  password: '{{ github_pass | b64encode }}'
+
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: ArgoCD
@@ -18,6 +30,14 @@ spec:
       generate:
         command: ["sh", "-c"]
         args: ["KUSTOMIZE_PLUGIN_HOME=$(pwd)/kustomize/plugin kustomize build --enable_alpha_plugins"]
+  initialRepositories: |
+    - url: {{ access_rules_repo }}
+      passwordSecret:
+        name: git-cred
+        key: password
+      usernameSecret:
+        name: git-cred
+        key: username
 
 ---
 kind: ConfigMap

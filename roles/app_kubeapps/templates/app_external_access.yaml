@@ -2,17 +2,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: external-access
+  name: external-access-base
   namespace: my-argocd-operator
+  labels:
+    argo-project: external-access
 spec:
   destination:
-    namespace: {{ ns }} 
+    namespace: {{ ns }}
     server: 'https://kubernetes.default.svc'
   source:
     repoURL: https://github.com/ThomasBuchinger/argo-playground
-    targetRevision: 'rev-proxy'
-    path: "reverse-proxy" 
+    targetRevision: 'HEAD'
+    path: "reverse-proxy"
     directory:
+      recurse: false
       jsonnet:
         extVars:
         - name: ingress_name
@@ -26,3 +29,87 @@ spec:
         - name: ingress_service_port
           value: http
   project: default
+  syncPolicy:
+    automated:
+      selfHeal: true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-access-rules
+  namespace: my-argocd-operator
+  labels:
+    argo-project: external-access
+spec:
+  destination:
+    namespace: {{ ns }}
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: https://github.com/ThomasBuchinger/access-rules
+    targetRevision: 'HEAD'
+    path: "."
+  project: default
+  syncPolicy:
+    automated:
+      selfHeal: true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webssh
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: {{ ns }}
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: https://github.com/ThomasBuchinger/argo-playground
+    targetRevision: 'HEAD'
+    path: "webssh"
+    directory:
+      recurse: false
+      jsonnet:
+        extVars:
+        - name: ingress_name
+          value: ssh
+        - name: ingress_domain
+          value: "{{ clustername }}.{{ ipa_domain }}"
+        - name: ingress_ip
+          value: {{ ansible_default_ipv4.address }}
+        - name: ingress_service_name
+          value: web-ssh-console  
+        - name: ingress_service_port
+          value: http
+  project: default
+  syncPolicy:
+    automated:
+      selfHeal: true
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-forward-auth-secrets
+  namespace: "{{ ns }}"
+  labels:
+    app: traefik-forward-auth
+type: Opaque
+data:
+  google-client-id: "{{ google_oauth_clientid | b64encode }}"
+  google-client-secret: "{{ google_oauth_clientsecret | b64encode }}"
+  secret: "{{ google_oauth_secret | b64encode }}"
+  public-domain: "{{ public_domain | b64encode }}"
+  auth-host: "{{ ['auth', public_domain ] | join('.') | b64encode }}"
+
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: external-access-users
+  namespace: "{{ ns }}"
+data:
+  # admin/admin
+  users: "{{ 'admin:$apr1$adkdUll5$6OcqMz9DXhIRG8pLItoWd/' | b64encode }}"
