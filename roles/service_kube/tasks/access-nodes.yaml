@@ -1,0 +1,17 @@
+- import_tasks: workers.yaml
+
+- name: Node / Label Node as external
+  command:
+    cmd: kubectl label --overwrite node {{ ansible_fqdn }} lab/security=external
+  environment:
+    KUBECONFIG: /etc/kubernetes/kubelet.conf
+
+- name: Node / Open Firewall
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+  loop:
+    - 8000/tcp
+    - 8443/tcp

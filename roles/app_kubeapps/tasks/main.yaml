@@ -35,7 +35,6 @@
   vars:
     app: External-Access
     ns: traefik
-  when: true
   block:
   - import_tasks: create_ns.yaml
   - import_tasks: manifest_apply_global.yaml
@@ -113,6 +112,20 @@
     vars:
       step_desc: Create Kubernetes Dashboard via Kustomize
       manifest: app_kubedash.yaml
+
+# === SSH Service ==================================================
+- name: "Apps / SSH / Create simple web-to-ssh service"
+  vars:
+    app: SSH
+    ns: ssh
+  block:
+  - import_tasks: create_ns.yaml
+  - import_tasks: manifest_apply_global.yaml
+    vars:
+      step_desc: Create SSH Service
+      manifest: app_ssh.yaml
+
+
 
 
 

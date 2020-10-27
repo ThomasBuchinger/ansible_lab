@@ -1,0 +1,157 @@
+
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: traefik-external-ingress
+  labels:
+    k8s-app: traefik-external-ingress
+spec:
+  selector:
+    matchLabels:
+      k8s-app: traefik-external-ingress
+      name: traefik-external-ingress
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-external-ingress
+        name: traefik-external-ingress
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8082'
+    spec:
+      tolerations:
+        - key: sec
+          operator: Equal
+          value: external
+          effect: NoExecute
+      nodeSelector:
+        lab/security: external
+      terminationGracePeriodSeconds: 60
+      serviceAccount: traefik-external-ingress
+      containers:
+      - image: traefik:{{ traefik_version }}
+        name: traefik
+        ports:
+        - name: acme
+          containerPort: 80
+          hostPort: 8000
+        - name: websecure
+          containerPort: 443
+          hostPort: 8443
+        - name: admin
+          containerPort: 8100
+        securityContext: {}
+        args:
+        - --api
+        - --api.insecure=true
+        - --api.dashboard=true
+        - --accesslog
+        - --ping=true
+        - --log.level=INFO
+        - --global.checknewversion=true
+        - --global.sendAnonymousUsage=false
+        - --entryPoints.traefik.address=:8100
+        - --entryPoints.acme.address=:80
+        - --entryPoints.websecure.address=:443
+
+        - --providers.kubernetescrd=true
+        - --providers.kubernetescrd.ingressclass=external
+        - --providers.kubernetescrd.namespaces=traefik
+        - --providers.kubernetescrd.disablepasshostheaders=true
+        - --providers.kubernetesingress=true
+        - --providers.kubernetesingress.ingressclass=external
+        - --providers.kubernetesingress.namespaces=traefik
+        - --providers.kubernetesingress.disablepasshostheaders=true
+
+        # Cert Resolver
+        - --certificatesresolvers.letsencrypt.acme.email=foo@bar.com
+        - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=acme
+        
+        # Tracing
+        # - --tracing.jaeger.collector.endpoint=http://jaeger-collector.monitor.svc.cluster.local:14268/api/traces?format=jaeger.thrift
+
+        # Metrics
+        - --metrics.prometheus=true
+        - --entryPoints.metrics.address=:8082
+        - --metrics.prometheus.entryPoint=metrics
+        - --metrics.prometheus.addServicesLabels=true
+        - --metrics.prometheus.addEntryPointsLabels=true
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: traefik-external-auth
+  labels:
+    k8s-app: traefik-external-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: traefik-external-auth
+  template:
+    metadata:
+      labels:
+        k8s-app: traefik-external-auth
+    spec:
+      containers:
+        - name: forward-auth
+          image: thomseddon/traefik-forward-auth:2
+          imagePullPolicy: IfNotPresent
+          ports:
+          - name: http
+            containerPort: 4181
+            hostPort: 4181
+          env:
+          - name: COOKIE_DOMAIN
+            valueFrom:
+                secretKeyRef:
+                  key: public-domain
+                  name: traefik-forward-auth-secrets
+          - name: SECRET
+            valueFrom:
+                secretKeyRef:
+                  key: secret
+                  name: traefik-forward-auth-secrets
+          - name: PROVIDERS_GOOGLE_CLIENT_ID
+            valueFrom:
+                secretKeyRef:
+                  key: google-client-id
+                  name: traefik-forward-auth-secrets
+          - name: PROVIDERS_GOOGLE_CLIENT_SECRET
+            valueFrom:
+                secretKeyRef:
+                  key: google-client-secret
+                  name: traefik-forward-auth-secrets
+          - name: AUTH_HOST
+            valueFrom:
+                secretKeyRef:
+                  key: auth-host
+                  name: traefik-forward-auth-secrets
+          - name: WHITELIST
+            valueFrom:
+                secretKeyRef:
+                  key: whitelist
+                  name: traefik-forward-auth-secrets
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      securityContext: {}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-external-ingress-ui
+spec:
+  selector:
+    k8s-app: traefik-external-ingress
+  ports:
+    - name: admin
+      port: 80
+      targetPort: admin

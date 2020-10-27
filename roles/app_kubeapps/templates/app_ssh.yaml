@@ -1,0 +1,33 @@
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webssh
+  namespace: my-argocd-operator
+spec:
+  destination:
+    namespace: ssh
+    server: 'https://kubernetes.default.svc'
+  source:
+    repoURL: https://github.com/ThomasBuchinger/argo-playground
+    targetRevision: 'HEAD'
+    path: "webssh"
+    directory:
+      recurse: false
+      jsonnet:
+        extVars:
+        - name: ingress_name
+          value: "{{ ns }}"
+        - name: ingress_domain
+          value: "{{ clustername }}.{{ ipa_domain }}"
+        - name: ingress_ip
+          value: {{ ansible_default_ipv4.address }}
+        - name: ingress_service_name
+          value: ssh-web-console
+        - name: ingress_service_port
+          value: http
+  project: default
+  syncPolicy:
+    automated:
+      selfHeal: true

@@ -2,8 +2,8 @@
 - hosts: vm1 
   roles:
     - common
-    - service_podman
-    - service_traefik_proxy
+#    - service_podman
+#    - service_traefik_proxy
   tasks:
     - include_role: 
         name: "config_ssh_server"

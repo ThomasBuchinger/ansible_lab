@@ -1,0 +1,23 @@
+- name: Config / Access / Taint all external access nodes
+  command: kubectl taint nodes --overwrite -l lab/security=external sec=external:NoExecute
+
+
+- name: Config / Access / Create Namespace
+  command:
+    stdin: '{"apiVersion":"v1", "kind": "Namespace", "metadata":{ "name": "traefik" }}'
+    argv: [ "kubectl", "apply", "-f", "-"]
+
+- name: Config / Access / Manifest for external lab access
+  template:
+    src: "{{ item }}"
+    dest: "{{ work_dir }}/app_kube/"
+  loop:
+    - external-config.yaml
+    - external-traefik.yaml
+
+- name: Config / Access / Create Ingress-Deployment for external lab access
+  command: "kubectl apply -n traefik -f {{ work_dir }}/app_kube/{{ item }}"
+  loop:
+    - external-config.yaml
+    - external-traefik.yaml
+

@@ -15,7 +15,7 @@ spec:
       kind: '*'
   orphanedResources:
     warn: false
-    
+
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -57,7 +57,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     repoURL: https://kubernetes-charts.storage.googleapis.com
-    targetRevision: '11.7.0'
+    targetRevision: {{ prometheus_chart_version }}
     chart: prometheus
     helm:
       parameters:
@@ -88,7 +88,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     repoURL: 'https://grafana.github.io/loki/charts'
-    targetRevision: '0.30.2'
+    targetRevision: {{ loki_chart_version }}
     chart: loki
   project: monitor
   syncPolicy:
@@ -106,7 +106,7 @@ spec:
     server: 'https://kubernetes.default.svc'
   source:
     repoURL: 'https://grafana.github.io/loki/charts'
-    targetRevision: '0.23.3'
+    targetRevision: {{ promtail_chart_version }}
     chart: promtail
     helm:
       parameters:
@@ -115,6 +115,16 @@ spec:
   project: monitor
   syncPolicy:
     automated: {}
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafna-admin
+  namespace: {{ ns }}
+data:
+  admin-user: ""
+  admin-password: ""
 
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -131,9 +141,12 @@ spec:
     automated: {}
   source:
     repoURL: https://kubernetes-charts.storage.googleapis.com
-    targetRevision: '5.4.1'
+    targetRevision: {{ grafana_chart_version }}
     chart: grafana
     helm:
+      parameters:
+      - name: admin.existingSecret
+        value: grafna-admin
       values: |
         grafana.ini:
           auth.anonymous:

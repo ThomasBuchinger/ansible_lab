@@ -38,6 +38,13 @@ spec:
       usernameSecret:
         name: git-cred
         key: username
+  resourceCustomizations: |
+    networking.k8s.io/Ingress:
+      health.lua: |
+        hs = {}
+        hs.status = "Healthy"
+        return hs
+    
 
 ---
 kind: ConfigMap

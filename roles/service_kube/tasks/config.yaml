@@ -9,5 +9,7 @@
 
 - import_tasks: config_ingress.yaml
 
+- import_tasks: config_external-ingress.yaml
+
 - import_tasks: config_storage_longhorn.yaml
 
