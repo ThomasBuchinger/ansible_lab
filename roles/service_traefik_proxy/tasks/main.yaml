@@ -1,0 +1,38 @@
+---
+- name: Install / Create Directory
+  file:
+    path: "{{ traefik_dir }}"
+    state: directory
+- name: Install / Copy start-script
+  template:
+    src: "{{ item }}.j2"
+    dest: "/bin/{{ item }}"
+    mode: 0755
+  loop:
+    - download_traefik_config.sh
+    - update_traefik.sh
+
+- name: Install / Copy systemd unit
+  template:
+    src: traefik.service.j2
+    dest: /etc/systemd/system/traefik.service
+
+- name: Install / Enable Service
+  systemd:
+    service: traefik.service
+    enabled: yes
+    state: started
+    daemon-reload: yes
+
+- name: Firewall / Open Ports
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    immediate: yes
+    permanent: yes
+  loop:
+    - 8443/tcp
+    - 8000/tcp
+    - 8080/tcp
+
+- import_tasks: auth.yaml

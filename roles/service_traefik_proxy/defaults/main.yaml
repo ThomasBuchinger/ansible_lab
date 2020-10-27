@@ -1,0 +1,9 @@
+---
+public_domain: example.com
+public_port: 443
+
+clustername: kube
+
+traefik_dir: /opt/traefik
+traefik_file_service: static
+traefik_config_url: http://{{ traefik_file_service }}.{{ clustername }}.{{ ipa_domain }}

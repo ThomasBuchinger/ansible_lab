@@ -1,0 +1,9 @@
+#!/bin/sh
+
+
+curl -o {{ traefik_dir }}/ca.crt {{ traefik_config_url }}/cred/ca.crt 
+curl -o {{ traefik_dir }}/traefik.yaml {{ traefik_config_url }}/static/traefik.yaml 
+export TOKEN=$(curl {{ traefik_config_url }}/cred/token)
+export URL=https://{{ clustername }}.{{ ipa_domain }}:6443
+
+sed -e "s!TOKEN!$TOKEN!" -e "s!URL!$URL!" -i {{ traefik_dir }}/traefik.yaml

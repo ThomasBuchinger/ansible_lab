@@ -1,0 +1,58 @@
+#!/bin/bash
+
+function get_release {
+  local TAG=$1
+  local BASE_URL="https://api.github.com/repos/containous/traefik"
+
+  DOWNLOAD_VERSION=$(curl -s -L "$BASE_URL/releases/$TAG" | awk '/"tag_name":/{ gsub(/"/, "", $2);gsub(/,/, "", $2); print $2 }')
+  DOWNLOAD_URL=$(curl -s -L "$BASE_URL/releases/$TAG" | awk '/"browser_download_url":[ ]?"(.*_linux_amd64.tar.gz)"/{ gsub(/"/, "", $2); print $2 }')
+}
+function get_version {
+  VERSION=$($1 version | awk '/Version/{ print $2 }' )
+}
+function clean_up {
+  rm -rf $WD
+}
+
+TRAEFIK_DIR="{{ traefik_dir }}"
+WD=$(mktemp -d)
+TAG="latest"
+
+
+get_release $TAG
+
+
+if [ -f $TRAEFIK_DIR/traefik ]; then
+  get_version $TRAEFIK_DIR/traefik
+  INSTALLED_VERSION="v$VERSION"
+  if [ ${INSTALLED_VERSION:-none} == ${DOWNLOAD_VERSION:-download_error} ]; then
+    echo "Installed Version is already up to date: $INSTALLED_VERSION = $DOWNLOAD_VERSION"
+    clean_up
+    exit 0
+  else
+    echo "Updating traefik from $INSTALLED_VERSION to $DOWNLOAD_VERSION"
+  fi
+else
+  echo "No existing installation found!"
+fi
+
+echo "Getting Tag $TAG: Version=$DOWNLOAD_VERSION URL=$DOWNLOAD_URL"
+curl -L -s -o $WD/traefik.tar.gz $DOWNLOAD_URL
+if [ $? -ne 0 ]; then
+  echo "Error Downloading Archive!"
+  clean_up
+  exit 2
+fi
+tar -xz -C $WD -f $WD/traefik.tar.gz
+if [ $? -ne 0 ]; then 
+  echo "Error extracting Archive! Maybe the download didn't do its thing?"
+  clean_up
+  exit 2
+fi  
+echo "Moving binary: $TRAEFIK_DIR"
+mv -f $WD/traefik $TRAEFIK_DIR/
+restorecon $TRAEFIK_DIR/traefik
+
+clean_up
+exit 0
+

@@ -1,0 +1,14 @@
+[Unit]
+Description=Traefik Reverse Proxy
+# ConditionFileIsExecutable={{ traefik_dir }}/traefik
+
+[Service]
+ExecStartPre=/bin/update_traefik.sh
+ExecStartPre=/bin/download_traefik_config.sh
+ExecStart={{ traefik_dir }}/traefik
+
+WorkingDirectory={{ traefik_dir }}
+# RootDirectory={{ traefik_dir }}
+
+[Install]
+WantedBy=multiuser.target

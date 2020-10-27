@@ -1,0 +1,12 @@
+- name: Auth / Copy systemd
+  template:
+    src: forward-auth.service.j2
+    dest: /etc/systemd/system/forward-auth.service
+
+- name: Auth / Enable forward-auth service
+  systemd:
+    name: forward-auth.service
+    enabled: yes
+    state: started
+    daemon-reload: yes
+

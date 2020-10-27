@@ -1,0 +1,11 @@
+- name: Podman / Enable yum module
+  yum:
+    name: "@container-tools:2.0/common" 
+    state: present
+
+- name: Podman / Install Podman
+  yum:
+    name: podman
+    state: present
+
+

@@ -1,0 +1,13 @@
+[Unit]
+Description=Redis Container
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/podman stop %n
+ExecStartPre=-/usr/bin/podman rm %n
+ExecStart=/usr/bin/podman run --rm --publish 127.0.0.1:4181:4181 --name %n --env "LOG_FORMAT=json" --env "COOKIE_DOMAIN={{ public_domain }}" --env "SECRET={{ google_oauth_secret }}" --env "PROVIDERS_GOOGLE_CLIENT_ID={{ google_oauth_clientid }}" --env "PROVIDERS_GOOGLE_CLIENT_SECRET={{ google_oauth_clientsecret }}" --env "AUTH_HOST=auth.{{ public_domain }}:{{ public_port }}" --env "WHITELIST={{ google_oauth_allowlist }}" -a STDOUT thomseddon/traefik-forward-auth:2
+
+
+[Install]
+WantedBy=multi-user.target

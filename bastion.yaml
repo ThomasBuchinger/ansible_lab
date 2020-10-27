@@ -1,0 +1,17 @@
+---
+- hosts: vm1 
+  roles:
+    - common
+    - service_podman
+    - service_traefik_proxy
+  tasks:
+    - include_role: 
+        name: "config_ssh_server"
+      vars:
+        username: access
+        groupname: admins
+        ssh_key: "{{ access_public_key }}"
+        nat_server: "{{ ansible_default_ipv4.gateway }}" 
+    #- include_tasks: plays/populate_bastion_home.yaml
+#    - include_role:
+#    name: config_security
