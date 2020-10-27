@@ -1,2 +1,2 @@
 clustername: kube
-olm_version: 0.12.0
+olm_version: 0.16.1

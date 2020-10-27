@@ -10,16 +10,16 @@
   loop:
     - https://operatorhub.io/install/argocd-operator.yaml
     - https://operatorhub.io/install/elastic-cloud-eck.yaml
-    - https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
-#    - https://operatorhub.io/install/project-quay.yaml # Does no work,, due to wrong CRD
+    - https://operatorhub.io/install/tektoncd-operator.yaml
+    # - https://operatorhub.io/install/project-quay.yaml # Does no work,, due to wrong CRD
     - https://operatorhub.io/install/kiali.yaml # Banzai Cloud Operator: Istio uses the native operator
-    - https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/common.yaml # Rolebindings for Rook
-    - https://operatorhub.io/install/rook-ceph.yaml
-#    - https://operatorhub.io/install/strimzi-kafka-operator.yaml
-#    - https://operatorhub.io/install/postgres-operator.yaml
+    # - https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/common.yaml # Rolebindings for Rook
+    # - https://operatorhub.io/install/rook-ceph.yaml
+    - https://operatorhub.io/install/strimzi-kafka-operator.yaml
+    # - https://operatorhub.io/install/postgres-operator.yaml
     # The Crunchy Data Operator does not support multiple namespaces
-#    - https://operatorhub.io/install/postgresql.yaml
-#    - https://operatorhub.io/install/kubevirt.yaml
+    # - https://operatorhub.io/install/postgresql.yaml
+    # - https://operatorhub.io/install/kubevirt.yaml
 
  
 - name: Kube APP / Operators / Manually create ns for Jaeger operator
@@ -51,4 +51,4 @@
   until: result.rc == 0
   loop:
     - argocds.argoproj.io
-#    - cephclusters.ceph.rook.io  
+    # - cephclusters.ceph.rook.io  

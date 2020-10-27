@@ -117,34 +117,34 @@
 
 
 # === Longhorn =====================================================
-- name: "Apps / Longhorn / Create App"
-  vars:
-    app: longhorn
-    ns: longhorn-system
-  block:
-  - import_tasks: create_ns.yaml
-  - import_tasks: manifest_apply_global.yaml
-    vars:
-      step_desc: Deploy Longhorn ArgoApp with StorageClasses
-      manifest: app_longhorn.yaml
-  - import_tasks: create_ingress.yaml
-    vars:
-      name: longhorn
-      service_name: longhorn-frontend
+#- name: "Apps / Longhorn / Create App"
+#  vars:
+#    app: longhorn
+#    ns: longhorn-system
+#  block:
+#  - import_tasks: create_ns.yaml
+#  - import_tasks: manifest_apply_global.yaml
+#    vars:
+#      step_desc: Deploy Longhorn ArgoApp with StorageClasses
+#      manifest: app_longhorn.yaml
+#  - import_tasks: create_ingress.yaml
+#    vars:
+#      name: longhorn
+#      service_name: longhorn-frontend
 
 # === Ceph =========================================================
-- name: "Apps / Ceph / Create App"
-  vars:
-    app: Ceph
-    ns: my-rook-ceph
-  when: true
-  block:
-  - import_tasks: manifest_apply_global.yaml
-    vars:
-      step_desc: Deploy Ceph CR
-      manifest: app_ceph.yaml
-  - import_tasks: create_ingress.yaml
-    vars:
-      name: ceph
-      service_name: rook-ceph-mgr-dashboard
-      service_port: 7000
+#- name: "Apps / Ceph / Create App"
+#  vars:
+#    app: Ceph
+#    ns: my-rook-ceph
+#  when: true
+#  block:
+#  - import_tasks: manifest_apply_global.yaml
+#    vars:
+#      step_desc: Deploy Ceph CR
+#      manifest: app_ceph.yaml
+#  - import_tasks: create_ingress.yaml
+#    vars:
+#      name: ceph
+#      service_name: rook-ceph-mgr-dashboard
+#      service_port: 7000
