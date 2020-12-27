@@ -19,6 +19,7 @@
   loop_control:
     loop_var: profile
   loop:
+    - { name: storage, cpus: 4, memory: 12, size: 100, additional_params: "--volume pool_name=default,capacity=150G,format_type=qcow2,allocation=0"}
     - { name: kube, cpus: 4, memory: 12, size: 100}
     - { name: default, cpus: 1, memory: 2, size: 100}
 
@@ -49,7 +50,7 @@
   register: os_cmd
   failed_when: os_cmd.rc >= 2
 - name: "[Configure] Configure OS: CentOS 7"
-  command: "python3 ./post-config-os.py --os 'Centos7' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition BUC-partition-tiny BUC-partition-var BUC-partition-opt"
+  command: "python3 ./post-config-os.py --os 'Centos7' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition BUC-partition-tiny BUC-partition-var BUC-partition-opt BUC-partition-multidisk"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   when: os_cmd.changed
@@ -64,7 +65,7 @@
   register: os_cmd
   failed_when: os_cmd.rc >= 2
 - name: "[Configure] Configure OS: CentOS 8"
-  command: "python3 ./post-config-os.py --os 'Centos8' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition BUC-partition-tiny BUC-partition-var BUC-partition-opt"
+  command: "python3 ./post-config-os.py --os 'Centos8' --provision 'Kickstart default' --pxe 'Kickstart default PXELinux' --partition BUC-partition-tiny BUC-partition-var BUC-partition-opt BUC-partition-multidisk"
   args:
     chdir: "{{ work_dir }}/service_foreman_server"
   when: os_cmd.changed

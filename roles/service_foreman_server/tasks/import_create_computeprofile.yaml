@@ -7,5 +7,5 @@
   failed_when: profile_cmd.rc >= 2
   changed_when: profile_cmd.rc == 1
 - name: "[Compute Profile] Add Profile values"
-  command: "hammer compute-profile values create --compute-profile {{ profile.name }} --compute-resource {{ foreman_default_compute }} --compute-attributes cpus={{ profile.cpus }},memory={{ profile.memory * 1024 * 1024 * 1024 }},cpu_mode=host-passthrough --volume pool_name=default,capacity={{ profile.size }}G,format_type=qcow2,allocation=0 --interface compute_type=bridge,compute_bridge=br0,compute_model=virtio"
+  command: "hammer compute-profile values create --compute-profile {{ profile.name }} --compute-resource {{ foreman_default_compute }} --compute-attributes cpus={{ profile.cpus }},memory={{ profile.memory * 1024 * 1024 * 1024 }},cpu_mode=host-passthrough --volume pool_name=default,capacity={{ profile.size }}G,format_type=qcow2,allocation=0 {{ profile.additional_params | default(None) }} --interface compute_type=bridge,compute_bridge=br0,compute_model=virtio"
   when: profile_cmd.rc == 1
