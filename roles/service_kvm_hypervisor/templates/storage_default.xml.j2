@@ -1,9 +1,9 @@
 <pool type='dir'>
-  <name>default</name>
+  <name>{{ pool.name }}</name>
   <source>
   </source>
   <target>
-    <path>{{ libvirt_default_storage_dir }}</path>
+    <path>{{ pool.dir }}</path>
     <permissions>
       <mode>0711</mode>
       <owner>0</owner>

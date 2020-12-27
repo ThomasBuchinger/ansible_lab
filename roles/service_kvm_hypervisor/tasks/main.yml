@@ -22,8 +22,6 @@
     state: present
   when: ansible_distribution_major_version == '8'
 
-
-
 - name: "Install / Enable Service"
   systemd:
     name: libvirtd
@@ -35,11 +33,16 @@
     src: kvm-kernel_params.conf
     dest: /etc/modprobe.d/kvm.conf
 
-- import_tasks: network_bridge.yml
-- import_tasks: storage_default.yml
-
 - name: "Cockpit / Install cockpit plugin for libvirt"
   yum:
     name:
       - cockpit-machines
     state: present
+
+- import_tasks: network_bridge.yml
+- include_tasks: 
+    file: import_storage.yml
+  loop_control: 
+    loop_var: pool
+  loop: "{{ libvirt_storage }}"
+

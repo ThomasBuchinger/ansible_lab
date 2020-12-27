@@ -1,21 +1,21 @@
 ---
 
-- name: "Storage / Create directory for default storage"
+- name: "Storage / {{ pool.name }} / Create directory"
   file:
-    path: "{{ libvirt_default_storage_dir }}"
+    path: "{{ pool.dir }}"
     state: directory
 
-- name: "Storage / Define default storage"
+- name: "Storage / {{ pool.name }} / Define storage pool"
   virt_pool:
-    name: default
+    name: "{{ pool.name }}"
     state: present
     xml: '{{ lookup("template", "storage_default.xml.j2") }}'
 - name: "Storage / Start default storage"
   virt_pool:
-    name: default
+    name: "{{ pool.name }}"
     state: active
 - name: "Storage / Set autostart for default storage"
   virt_pool:
-    name: default
+    name: "{{ pool.name }}"
     autostart: true 
 

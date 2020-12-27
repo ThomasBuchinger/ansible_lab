@@ -1,6 +1,8 @@
 ---
-libvirt_default_storage_dir: /var/lib/libvirt/images
+#libvirt_default_storage_dir: /var/lib/libvirt/images
+libvirt_storage:
+  - { name: default, dir: /var/lib/libvirt/images }
+  - { name: isos, dir: /var/lib/libvirt/images/isos }
+  - { name: temp, dir: /var/lib/libvirt/images/temp }
 
-webvirtmgr_path: /usr/local/webvirtmgr
-webvirtmgr_bind: 0.0.0.0:8000
 
