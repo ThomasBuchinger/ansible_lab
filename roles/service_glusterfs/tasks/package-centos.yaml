@@ -1,0 +1,11 @@
+---
+- name: GlusterFS / Install CentOS-Release
+  yum:
+    name: centos-release-gluster8
+    state: present
+
+- name: GlusterFS / Install Gluster
+  yum:
+    name: glusterfs-server
+    state: present
+

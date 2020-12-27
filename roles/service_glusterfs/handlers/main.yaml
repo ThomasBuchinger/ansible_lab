@@ -1,0 +1,5 @@
+---
+- name: restart_heketi
+  systemd:
+    name: heketi
+    state: restarted

@@ -1,0 +1,94 @@
+- name: Heketi / Load kernel modules
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - dm_snapshot
+    - dm_mirror
+    - dm_thin_pool
+
+- name: Heketi / Install
+  yum:
+    name: 
+      - https://download.copr.fedorainfracloud.org/results/thomasbuchinger/heketirpm/fedora-32-x86_64/01830006-heketi/heketi-10.1.0-1.fc32.x86_64.rpm
+      - https://download.copr.fedorainfracloud.org/results/thomasbuchinger/heketirpm/fedora-32-x86_64/01830006-heketi/heketi-client-10.1.0-1.fc32.x86_64.rpm
+    state: present
+
+- name: Heketi / Copy config
+  template:
+    src: heketi.json.j2
+    dest: /etc/heketi/heketi.json
+    owner: heketi
+    group: heketi
+  notify: restart_heketi
+
+
+- set_fact:
+    glustertopo: >
+      {% for host in groups['gluster_nodes'] %}
+      {"servername": "{{ host }}.{{ dns_domain }}", "serverip": "{{ hostvars[host]['ansible_host'] }}","zone": 1,"disks": ["{\"name\": \"/dev/vdb\", \"destroydata\": true }"] };{% endfor %}
+- set_fact:    
+    glustertopo3: "[ {{ glustertopo.split(';')[:-1] | join(',') }} ]"
+
+- name: Heketi / Copy topology
+  template:
+    src: topology.json.j2
+    dest: /etc/heketi/topology.json
+  notify: restart_heketi
+  vars:
+    gluster_servers: "{{ glustertopo3 }}"
+
+- name: Heketi / File permissions
+  systemd:
+    name: heketi
+    enabled: yes
+    state: started
+- name: Heketi / Enable service
+  systemd:
+    name: heketi
+    enabled: yes
+    state: started
+- name: Heketi / Open Firewall
+  firewalld:
+    port: "{{ heketi_port }}/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+#- name: Heketi / Download Heketi-CLI (not included in RPM -,-)
+#  shell: 
+#    cmd: >
+#      curl -s https://api.github.com/repos/heketi/heketi/releases/latest | 
+#      grep "browser_download_url.*heketi-v.*.linux.amd64.tar.gz" | cut -d : -f 2,3 | tr -d \" | 
+#      xargs curl -L | tar -xz --exclude heketi.json --strip-components 1
+#    chdir: /var/lib/heketi/
+#    creates: heketi-cli
+
+- name: Heketi / Check topology
+  command: 
+    cmd: "heketi-cli --server http://127.0.0.1:{{ heketi_port }} --user admin --secret {{ heketi_adminkey }} topology info"
+    chdir: /var/lib/heketi
+  register: heketi_topology
+
+- name: Heketi / Import topology
+  block:
+    - shell: "/bin/killall --wait glusterfsd || /bin/true"
+    - name: Topology Reset / Unmount
+      mount:
+        path: "{{  item }}"
+        state: unmounted
+      loop: "{{  ansible_mounts | json_query('[*].mount') | map('regex_search', '(/var/lib/heketi/mounts/.*)') | select() | list }}"
+    - name: Topology Reset / Reset Disks
+      lvg:
+        vg: "{{ ansible_lvm['pvs']['/dev/vdb']['vg'] }}"
+        state: absent
+        force: yes
+      when: ansible_lvm['pvs']['/dev/vdb']
+    - name: Topology Reset / Load topology to heketi
+      command: 
+        cmd: "heketi-cli --server http://127.0.0.1:{{ heketi_port }} --user admin --secret {{ heketi_adminkey }} topology load --json /etc/heketi/topology.json"
+        chdir: /var/lib/heketi
+      throttle: 1
+  when: heketi_topology.stdout == ""
+  
+

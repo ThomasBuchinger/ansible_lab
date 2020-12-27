@@ -1,0 +1,23 @@
+
+- name: Gluster / Form glusterfs cluster
+  gluster_peer:
+    state: present
+    nodes: "{{ item }}"
+  loop: "{{ groups['gluster_nodes'] | difference(inventory_hostname) }}"
+
+- name: Heketi / Check topology
+  command: 
+    cmd: "heketi-cli --server http://127.0.0.1:{{ heketi_port }} --user admin --secret {{ heketi_adminkey }} topology info"
+    chdir: /var/lib/heketi
+  register: heketi_topology
+
+- name: Heketi / Import topology
+  block: 
+    - name: Topology Reset / Load topology to heketi
+      command: 
+        cmd: "heketi-cli --server http://127.0.0.1:{{ heketi_port }} --user admin --secret {{ heketi_adminkey }} topology load --json /etc/heketi/topology.json"
+        chdir: /var/lib/heketi
+      notify: restart_heketi
+  when: heketi_topology.stdout == ""
+  
+

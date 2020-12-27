@@ -1,0 +1,22 @@
+---
+- import_tasks: package-centos.yaml
+
+- name: GlusterFS / Make Brick directory
+  file:
+    path: /opt/brick
+    state: directory
+
+- name: GlusterFS / Start Service
+  systemd:
+    name: glusterd
+    enabled: yes
+    state: started
+
+- name: GlusterFS / Open Firewall
+  firewalld:
+    service: glusterfs
+    state: enabled
+    permanent: yes
+    immediate: yes
+
+- import_tasks: heketi.yaml

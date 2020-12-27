@@ -1,0 +1,43 @@
+---
+- name: Kubernetes / Create namespae
+  command:
+    stdin: |
+      kind: Namespace
+      apiVersion: v1
+      metadata:
+        name: glusterfs
+    argv: [ "kubectl", "apply", "-f", "-"]
+
+- name: Kubernetes / Create credentials Secret
+  command:
+    stdin: |
+      kind: Secret
+      apiVersion: v1
+      metadata:
+        name: gluster-credentials
+        namespace: glusterfs
+      type: kubernetes.io/glusterfs
+      data:
+        key: {{ heketi_adminkey | b64encode }}
+    argv: [ "kubectl", "apply", "-f", "-"]
+
+
+- name: Kubernetes / Create StorageClass
+  command:
+    stdin: |
+      kind: StorageClass
+      apiVersion: storage.k8s.io/v1
+      metadata:
+        name: gluster-storage
+        annotations:
+          storageclass.kubernetes.io/is-default-class: 'false'
+      provisioner: kubernetes.io/glusterfs
+      parameters:
+        resturl: http://{{ hostvars[groups['gluster_nodes'][0]]['ansible_host'] }}:{{ heketi_port }}
+        restuser: admin
+        secretName: gluster-credentials
+        secretNamespace: glusterfs
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+    argv: [ "kubectl", "apply", "-f", "-"]
+
