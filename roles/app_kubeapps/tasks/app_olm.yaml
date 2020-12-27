@@ -13,6 +13,7 @@
     - https://operatorhub.io/install/kiali.yaml # Banzai Cloud Operator: Istio uses the native operator
     - https://operatorhub.io/install/strimzi-kafka-operator.yaml
     - https://operatorhub.io/install/postgres-operator.yaml
+    - https://operatorhub.io/install/kubemod.yaml
     # - https://operatorhub.io/install/couchdb-operator.yaml
     # - https://raw.githubusercontent.com/rook/rook/release-1.4/cluster/examples/kubernetes/ceph/common.yaml # Rolebindings for Rook
     # - https://operatorhub.io/install/rook-ceph.yaml
