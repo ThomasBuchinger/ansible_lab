@@ -1,5 +1,3 @@
-- import_tasks: workers.yaml
-
 - name: Node / Label Node as external
   command:
     cmd: kubectl label --overwrite node {{ ansible_fqdn }} lab/security=external

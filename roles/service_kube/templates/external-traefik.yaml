@@ -102,7 +102,6 @@ spec:
           ports:
           - name: http
             containerPort: 4181
-            hostPort: 4181
           env:
           - name: COOKIE_DOMAIN
             valueFrom:
@@ -155,3 +154,16 @@ spec:
     - name: admin
       port: 80
       targetPort: admin
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-forward-auth
+spec:
+  selector:
+    k8s-app: traefik-external-auth
+  ports:
+    - name: auth
+      port: 4181
+      targetPort: 4181

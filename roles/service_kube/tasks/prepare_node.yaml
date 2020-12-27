@@ -18,10 +18,18 @@
     - "10255"
     - "30000-32767"
 
-- name: Node / Install OS dependencies (aka nfs)
+- name: Node / Storage /Install OS dependencies (aka nfs)
   yum:
-    name: nfs-utils
+    name: 
+      - nfs-utils
+      - glusterfs-fuse
     state: present
+
+- name: Node / Storage / Create Dirs for local PVs
+  file:
+    name: "/var/lib/kube-pv/{{ item.name }}-{{ inventory_hostname }}"
+    state: directory
+  loop: "{{ local_storage }}"
 
 # Disable Cockpit on worker nodes, because Ceph uses Port 9090
 - file:

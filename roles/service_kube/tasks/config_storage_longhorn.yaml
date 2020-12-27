@@ -1,4 +1,50 @@
 
+- name: Storage / Local / Create local PVs
+  command:
+    stdin: |
+      apiVersion: v1
+      kind: PersistentVolume
+      metadata:
+        name: {{ item[0].name }}-{{ item[1] }}
+      spec:
+        capacity:
+          storage: {{ item[0].size }}Gi
+        volumeMode: Filesystem
+        accessModes:
+        - ReadWriteOnce
+        persistentVolumeReclaimPolicy: Delete
+        storageClassName: local-storage
+        local:
+          path: /var/lib/kube-pv/{{ item[0].name }}-{{ item[1] }}
+        nodeAffinity:
+          required:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - {{ item[1] }}.{{ ipa_domain }}
+
+    argv: [ "kubectl", "apply", "-f", "-"]
+  with_nested:
+    - "{{ local_storage }}"
+    - "{{ groups['kube_nodes'] }}"
+
+
+- name: Storage / Local / Create StorageClass
+  command:
+    stdin: |
+      kind: StorageClass
+      apiVersion: storage.k8s.io/v1
+      metadata:
+        name: local-storage
+        annotations:
+          storageclass.kubernetes.io/is-default-class: 'true'
+      provisioner: kubernetes.io/no-provisioner
+      volumeBindingMode: WaitForFirstConsumer
+    argv: [ "kubectl", "apply", "-f", "-"]
+
+
 - name: Storage / NFS / Create static NFS PVs
   command:
     stdin: |
@@ -18,6 +64,7 @@
         storageClassName: nfs-storage
         mountOptions:
           - vers=3
+          - rw
         nfs:
           path: "{{ nfs_path }}{{ item.name }}"
           server: {{ nfs_server }}
@@ -33,16 +80,17 @@
       metadata:
         name: nfs-storage
         annotations:
-          storageclass.kubernetes.io/is-default-class: 'true'
+          storageclass.kubernetes.io/is-default-class: 'false'
       provisioner: kubernetes.io/local
       reclaimPolicy: Delete
       volumeBindingMode: Immediate
     argv: [ "kubectl", "apply", "-f", "-"]
 
 
-- name: Storage / Longhorn / Install iSCSI
+- name: "Storage / Install storage clients: iSCSI"
   yum:
-    name: iscsi-initiator-utils
+    name: 
+      - iscsi-initiator-utils
     state: present
 
 #- name: Storage / Longhorn / Install Longhorn

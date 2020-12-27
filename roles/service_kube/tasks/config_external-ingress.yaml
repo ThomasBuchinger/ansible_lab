@@ -1,6 +1,9 @@
 - name: Config / Access / Taint all external access nodes
   command: kubectl taint nodes --overwrite -l lab/security=external sec=external:NoExecute
 
+- command: echo "auth.{{ public_domain }}:{{ public_port }}"
+  register: auth_host_url
+
 
 - name: Config / Access / Create Namespace
   command:

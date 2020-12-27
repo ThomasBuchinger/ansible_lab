@@ -11,7 +11,7 @@ data:
   google-client-secret: "{{ google_oauth_clientsecret | b64encode }}"
   secret: "{{ google_oauth_secret | b64encode }}"
   public-domain: "{{ public_domain | b64encode }}"
-  auth-host: "{{ ['auth', public_domain ] | join('.') | b64encode }}"
+  auth-host: "{{ auth_host_url.stdout | b64encode }}"
   whitelist: "{{ google_oauth_allowlist | b64encode }}"
 
 ---
@@ -72,23 +72,23 @@ spec:
               serviceName: traefik-external-ingress-ui
               servicePort: 80
 
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: traefik-dashboard
-#   annotations:
-#     kubernetes.io/ingress.class: external
-# spec:
-#   entryPoints:
-#   - traefik
-#   routes:
-#   - match: (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
-#     kind: Rule
-#     services:
-#     - name: api@internal
-#       kind: TraefikService
-#     middlewares: []
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  annotations:
+    kubernetes.io/ingress.class: external
+spec:
+  entryPoints:
+  - traefik
+  routes:
+  - match: (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+    kind: Rule
+    services:
+    - name: api@internal
+      kind: TraefikService
+    middlewares: []
     
 ---
 apiVersion: v1
@@ -100,7 +100,7 @@ metadata:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: traefik-ingress-controller
+  name: traefik-external-ingress
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
