@@ -1,0 +1,42 @@
+
+
+- hosts: gluster1,gluster2,gluster3 
+  roles:
+    - common
+    - service_glusterfs
+  pre_tasks:
+  # Setup SSH for Foreman Proxy
+  - name: "[SSH-Key] Install the SSH key to Foreman proxy"
+    include_role:
+      name: config_ssh_key
+      tasks_from: ssh_copy_key.yml
+    vars:
+      key_private: "{{ ansible_private_key }}"
+      key_public: "{{ ansible_public_key }}"
+      key_path: "/etc/heketi/.ssh"
+      private_key_name: id_rsa
+      ssh_user_name: heketi
+      ssh_user_create_home: yes
+      ssh_touch_known_hosts: "/etc/heketi/.ssh/known_hosts"
+      ssh_touch_authorized_keys: "/etc/heketi/.ssh/authorized_keys"
+      key_owner: heketi
+      key_group: heketi
+      key_permission: "0600"
+  - name: SSH-Key / Copy Public Key
+    copy:
+      src: /etc/heketi/.ssh/id_rsa.pub
+      remote_src: yes
+      dest: /etc/heketi/.ssh/authorized_keys 
+
+- hosts: "{{ groups['gluster_nodes'][0] }}"
+  tasks:
+    - include_role: 
+        name: service_glusterfs
+        tasks_from: primary.yaml
+
+- hosts: kube_seed
+  tasks:
+    - include_role: 
+        name: service_glusterfs
+        tasks_from: k8s.yaml
+
