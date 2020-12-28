@@ -1,0 +1,31 @@
+---
+- name: Configure Repo
+  yum_repository:
+    name: terraform
+    description: Hashicorp Terraform Repo
+    baseurl: https://rpm.releases.hashicorp.com/RHEL/$releasever/$basearch/stable
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+    gpgcheck: yes
+- name: Plugins / Configure Repo
+  yum_repository:
+    name: terraform-libvirt-provider
+    description: Libvirt Provider for terraform
+    baseurl: https://download.opensuse.org/repositories/systemsmanagement:/terraform/Fedora_32/
+    gpgkey: https://download.opensuse.org/repositories/systemsmanagement:/terraform/Fedora_32/repodata/repomd.xml.key
+    gpgcheck: yes
+
+- name: Terraform / Install binary
+  yum:
+    name: 
+      - terraform
+      - terraform-provider-libvirt
+    state: present
+
+- name: Terraform / Create project directorys
+  file:
+    path: "{{ tf_root }}/{{ item }}"
+    state: directory
+  loop:
+    - .terraform.d/plugins
+    - foreman
+
